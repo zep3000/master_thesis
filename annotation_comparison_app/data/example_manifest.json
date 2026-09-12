@@ -1,0 +1,14 @@
+{
+  "task_id": "synthetic_comparison_example",
+  "images": [
+    {
+      "image_id": "example-page",
+      "filename": "example-page.jpg",
+      "path": "images/example-page.jpg",
+      "page_type": "single",
+      "metadata": {
+        "synthetic": true
+      }
+    }
+  ]
+}

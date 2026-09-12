@@ -32,6 +32,15 @@ artifacts. Keep the tracked tree suitable for public access.
 - Notebooks in `code/scripts/annotation/` use `../../../data/`.
 - Application inputs and autosaves belong below
   `annotation_app_bboxes_full_issues/data/` and remain ignored.
+- Comparison-app inputs and manual matches belong below
+  `annotation_comparison_app/data/`; only its README and synthetic example
+  manifest are tracked.
+- Brand-verification manifests, images, sessions, and exports belong below
+  `annotation_brand_verification_app/data/`; only its README and synthetic
+  example manifest are tracked.
+- Local annotation servers must bind to loopback by default. Image endpoints
+  may serve only files resolved beneath explicitly configured roots or from an
+  active, allowlisted manifest.
 
 ## Versioned figure interface
 
@@ -55,4 +64,6 @@ artifacts. Keep the tracked tree suitable for public access.
 - Recompute every manifest size and SHA-256 value.
 - Search tracked files for credentials, absolute local paths, and excluded
   material.
+- Run each tracked Node application's test suite and parse all bundled JSON and
+  YAML fixtures before committing.
 - Keep changes scoped and preserve existing user edits.

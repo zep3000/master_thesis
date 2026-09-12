@@ -1,0 +1,15 @@
+{
+  "name": "annotation-brand-verification-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local ad-level verification of model-assigned brand categories and brand names.",
+  "type": "commonjs",
+  "scripts": {
+    "build:manifest": "node scripts/build-manifest.js",
+    "start": "node server.js",
+    "test": "node --test --experimental-test-isolation=none"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

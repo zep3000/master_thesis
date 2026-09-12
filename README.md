@@ -9,6 +9,10 @@ expressions in historical advertising.
 - `code/scripts/`: analysis and data-preparation notebooks
 - `code/output/figures/`: selected generated figures and a checksum manifest
 - `annotation_app_bboxes_full_issues/`: local PDF bounding-box annotation app
+- `annotation_comparison_app/`: local interface for comparing compatible
+  human and model annotation sources
+- `annotation_brand_verification_app/`: local advertisement-category and
+  brand-name verification interface
 - `data/README.md`: source provenance, data availability, processing lineage,
   and expected local layout
 

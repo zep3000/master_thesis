@@ -21,6 +21,12 @@ data/*
 
 # Local application inputs and annotation exports.
 annotation_app_bboxes_full_issues/data/
+annotation_comparison_app/data/*
+!annotation_comparison_app/data/README.md
+!annotation_comparison_app/data/example_manifest.json
+annotation_brand_verification_app/data/*
+!annotation_brand_verification_app/data/README.md
+!annotation_brand_verification_app/data/example_manifest.json
 annotation_app_bboxes_full_issues/test_assets/
 
 # Generated table fragments are manuscript content and remain private unless

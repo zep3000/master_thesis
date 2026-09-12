@@ -1,0 +1,45 @@
+{
+  "schema_version": "brand_verification_manifest_v1",
+  "task_id": "synthetic_brand_verification_example",
+  "name": "Synthetic brand-verification example",
+  "created_at": "2000-01-01T00:00:00.000Z",
+  "source": {
+    "synthetic": true
+  },
+  "brand_categories": [
+    "Automotive",
+    "Food"
+  ],
+  "image_count": 1,
+  "item_count": 1,
+  "images": [
+    {
+      "image_id": "example-page",
+      "filename": "example-page.jpg",
+      "page_type": "single",
+      "image_position": 0,
+      "metadata": {
+        "synthetic": true
+      },
+      "advertisements": [
+        {
+          "item_id": "example-page__ad_1",
+          "item_position": 0,
+          "advertisement_id": "ad_1",
+          "bbox_1000": [
+            100,
+            100,
+            900,
+            900
+          ],
+          "assigned_brand_category": "Automotive",
+          "assigned_brand_name": "Example Motors",
+          "extent": "full_page",
+          "face_boxes_1000": [],
+          "model_confidence": 0.9,
+          "model_review_flags": []
+        }
+      ]
+    }
+  ]
+}

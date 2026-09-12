@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Annotation Compare</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div class="product-title">
+          <strong>Annotation Compare</strong>
+          <span id="taskLabel">Loading collection...</span>
+        </div>
+        <div class="top-actions">
+          <label class="manifest-select">
+            <span>Images</span>
+            <select id="manifestSelect">
+              <option value="">Auto: newest human export</option>
+            </select>
+          </label>
+          <label class="image-dir-select">
+            <span>Folder</span>
+            <select id="imageDirSelect">
+              <option value="">Auto search</option>
+            </select>
+          </label>
+          <button id="togglePages" type="button">Pages</button>
+          <button id="prevPage" type="button" title="Previous page">Previous</button>
+          <span id="pagePosition" class="page-position"></span>
+          <button id="nextPage" type="button" title="Next page">Next</button>
+          <button id="refreshData" type="button" title="Rescan annotation sources">Refresh</button>
+          <button id="toggleSources" type="button">Sources</button>
+        </div>
+      </header>
+
+      <section id="workspace" class="workspace pages-open">
+        <aside id="pageSidebar" class="page-sidebar">
+          <div class="sidebar-head">
+            <label class="search-field">
+              <span>Find page</span>
+              <input id="pageSearch" type="search" placeholder="Year or filename">
+            </label>
+            <label class="compact-select">
+              <span>Show</span>
+              <select id="pageFilter">
+                <option value="all">All pages</option>
+                <option value="multi">Multiple sources</option>
+                <option value="human_llm">Human + LLM</option>
+              </select>
+            </label>
+          </div>
+          <div id="pageList" class="page-list"></div>
+        </aside>
+
+        <section class="image-pane">
+          <div class="image-toolbar">
+            <div>
+              <strong id="imageTitle"></strong>
+              <span id="imageSourceCount"></span>
+            </div>
+            <div class="toolbar-actions">
+              <label class="entity-toggle"><input type="checkbox" data-entity="ad" checked> Ads</label>
+              <label class="entity-toggle"><input type="checkbox" data-entity="person" checked> Faces</label>
+              <label class="entity-toggle"><input type="checkbox" data-entity="group" checked> People areas</label>
+              <button type="button" data-zoom="fit" title="Fit image">Fit</button>
+              <button type="button" data-zoom="out" title="Zoom out">-</button>
+              <button type="button" data-zoom="in" title="Zoom in">+</button>
+            </div>
+          </div>
+          <div id="imageScroll" class="image-scroll">
+            <div id="imageStage" class="image-stage">
+              <img id="pageImage" alt="Magazine page under comparison">
+              <svg id="overlay" class="overlay"></svg>
+            </div>
+          </div>
+          <div id="overlayLegend" class="overlay-legend"></div>
+        </section>
+
+        <aside id="comparisonPanel" class="comparison-panel">
+          <section id="sourceDrawer" class="source-drawer">
+            <div class="panel-heading">
+              <div>
+                <span class="eyebrow">Visible sources</span>
+                <strong id="selectedSourceCount"></strong>
+              </div>
+              <button id="manageSources" type="button">Manage</button>
+            </div>
+            <div id="sourceList" class="source-list"></div>
+          </section>
+
+          <section class="agreement-strip" id="agreementStrip"></section>
+
+          <nav class="tabs" aria-label="Comparison detail">
+            <button type="button" data-tab="summary" class="active">Summary</button>
+            <button type="button" data-tab="ads">Ads</button>
+            <button type="button" data-tab="people">People</button>
+            <button type="button" data-tab="groups">People areas</button>
+            <button type="button" data-tab="provenance">Provenance</button>
+          </nav>
+
+          <div class="comparison-options">
+            <label class="disagreement-toggle">
+              <input id="disagreementOnly" type="checkbox">
+              Only disagreements
+            </label>
+            <div class="label-language-toggle" aria-label="Annotation label language">
+              <span>Labels</span>
+              <button type="button" data-label-language="en" class="active">EN</button>
+              <button type="button" data-label-language="de">DE</button>
+            </div>
+          </div>
+          <div id="comparisonContent" class="comparison-content"></div>
+        </aside>
+      </section>
+      <footer class="statusbar">
+        <span id="loadStatus">Loading sources...</span>
+        <span id="coordinateNote">Boxes are aligned in normalized page coordinates.</span>
+      </footer>
+    </main>
+
+    <dialog id="sourceDialog" class="source-dialog">
+      <div class="source-dialog-body">
+        <header>
+          <div><span class="eyebrow">Comparison inputs</span><h2>Manage sources</h2></div>
+          <button id="closeSourceDialog" type="button">Close</button>
+        </header>
+        <label class="source-search">
+          <span>Find source</span>
+          <input id="sourceSearch" type="search" placeholder="Annotator, session, run, or model">
+        </label>
+        <div class="source-bulk-actions">
+          <button type="button" data-source-action="available">Current page</button>
+          <button type="button" data-source-action="human">All human</button>
+          <button type="button" data-source-action="llm">All LLM</button>
+          <button type="button" data-source-action="all">All sources</button>
+          <button type="button" data-source-action="clear">Clear</button>
+        </div>
+        <div id="sourceManagerList" class="source-manager-list"></div>
+      </div>
+    </dialog>
+    <script src="/agreement.js"></script>
+    <script src="/app.js"></script>
+  </body>
+</html>

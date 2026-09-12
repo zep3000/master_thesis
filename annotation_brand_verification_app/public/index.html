@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Brand Verification</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main id="welcomeView" class="centered-view">
+      <section class="welcome-panel">
+        <p class="eyebrow">Local review workspace</p>
+        <h1>Brand verification</h1>
+        <div class="welcome-copy">
+          <p>Review the assigned category and brand name for each detected advertisement.</p>
+          <p>Mark each result as correct or incorrect. If it is incorrect, provide the correct value. If the highlighted region is not an advertisement or identifies the wrong advertisement, use <strong>Identification is wrong</strong>.</p>
+          <p>Your work is saved locally and can be resumed with its eight-digit session number.</p>
+        </div>
+        <div class="dataset-summary" aria-live="polite">
+          <div><strong id="welcomeImages">—</strong><span>Source images</span></div>
+          <div><strong id="welcomeItems">—</strong><span>Ads to verify</span></div>
+        </div>
+        <div class="session-mode" role="group" aria-label="Session mode">
+          <button type="button" class="mode-button selected" data-mode="new" aria-pressed="true">New verification</button>
+          <button type="button" class="mode-button" data-mode="resume" aria-pressed="false">Resume verification</button>
+        </div>
+        <div id="resumeArea" class="resume-area hidden">
+          <label>Saved session
+            <select id="sessionSelect"><option value="">No saved sessions</option></select>
+          </label>
+        </div>
+        <button id="startButton" class="primary wide" type="button">Start new verification</button>
+        <p id="welcomeStatus" class="status" role="status"></p>
+      </section>
+    </main>
+
+    <main id="appView" class="app-view hidden">
+      <aside id="itemSidebar" class="item-sidebar">
+        <div class="sidebar-header">
+          <div>
+            <span class="eyebrow">Verification items</span>
+            <strong id="sidebarProgress">0 / 0 complete</strong>
+          </div>
+          <button id="closeSidebar" class="icon-button mobile-only" type="button" aria-label="Close item list">×</button>
+        </div>
+        <div class="legend">
+          <span><i class="dot not-started"></i>Not started</span>
+          <span><i class="dot started"></i>Started</span>
+          <span><i class="dot complete"></i>Done</span>
+        </div>
+        <label class="search-label">Search image or ad
+          <input id="itemSearch" type="search" placeholder="e.g. example-page or ad_2">
+        </label>
+        <div id="itemList" class="item-list"></div>
+      </aside>
+
+      <section class="image-pane">
+        <header class="image-header">
+          <div>
+            <span id="itemPosition" class="eyebrow"></span>
+            <h1 id="imageTitle"></h1>
+          </div>
+          <div class="image-actions">
+            <button id="viewToggle" type="button">Zoom to model box</button>
+            <button id="faceBoxesToggle" type="button" aria-pressed="true">Hide face boxes</button>
+            <button id="zoomOut" type="button" aria-label="Zoom out">−</button>
+            <button id="zoomFit" type="button">Fit</button>
+            <button id="zoomIn" type="button" aria-label="Zoom in">+</button>
+          </div>
+        </header>
+        <div id="imageScroll" class="image-scroll" title="Hold Ctrl and use the mouse wheel to zoom around the pointer">
+          <div id="imageLoading" class="image-loading">Loading image…</div>
+          <canvas id="adCanvas" aria-label="Advertisement image"></canvas>
+        </div>
+        <div class="image-caption">
+          <span id="adId"></span>
+          <span id="imageMetadata"></span>
+        </div>
+      </section>
+
+      <aside class="review-panel">
+        <div class="review-scroll">
+          <div class="review-heading">
+            <p class="eyebrow">Check model output</p>
+            <h2>Is this identification correct?</h2>
+          </div>
+
+          <label class="wrong-identification">
+            <input id="identificationWrong" type="checkbox">
+            <span><strong>Identification is wrong</strong><small>The highlighted region is not an ad or refers to the wrong advertisement.</small></span>
+          </label>
+          <label id="identificationNoteField" class="hidden">What is wrong? <span class="optional">Optional</span>
+            <textarea id="identificationNote" rows="3" placeholder="Add a short explanation"></textarea>
+          </label>
+
+          <label class="no-faces-option">
+            <input id="noFaces" type="checkbox">
+            <span><strong>No faces in this advertisement</strong><small>Select this when the ad contains no visible face, including when a displayed model face box is a false positive.</small></span>
+          </label>
+
+          <div id="fieldReviews" class="field-reviews">
+            <section class="field-card">
+              <span class="field-label">Assigned brand category</span>
+              <strong id="assignedCategory" class="assigned-value"></strong>
+              <div class="verdict-control" role="group" aria-label="Brand category verdict">
+                <button type="button" data-field="category" data-verdict="correct">Correct</button>
+                <button type="button" data-field="category" data-verdict="incorrect">Incorrect</button>
+              </div>
+              <label id="categoryCorrectionField" class="correction-field hidden">Correct category
+                <select id="categoryCorrection"></select>
+              </label>
+            </section>
+
+            <section class="field-card">
+              <span class="field-label">Assigned brand name</span>
+              <strong id="assignedBrand" class="assigned-value"></strong>
+              <div class="verdict-control" role="group" aria-label="Brand name verdict">
+                <button type="button" data-field="brand" data-verdict="correct">Correct</button>
+                <button type="button" data-field="brand" data-verdict="incorrect">Incorrect</button>
+              </div>
+              <label id="brandCorrectionField" class="correction-field hidden">Correct brand name
+                <input id="brandCorrection" type="text" maxlength="160" placeholder="Enter the visible brand, or unclear">
+              </label>
+            </section>
+          </div>
+
+          <label>Notes <span class="optional">Optional</span>
+            <textarea id="notes" rows="3" placeholder="Anything else worth recording"></textarea>
+          </label>
+          <p id="saveStatus" class="status" role="status"></p>
+        </div>
+        <div class="review-actions">
+          <button id="previousButton" type="button">Previous</button>
+          <button id="saveNextButton" class="primary" type="button">Save &amp; next</button>
+        </div>
+      </aside>
+
+      <footer class="app-footer">
+        <button id="sidebarToggle" type="button">Items</button>
+        <span>Session <strong id="sessionCode"></strong></span>
+        <div class="task-progress"><span id="footerProgress">0 / 0</span><progress id="progressBar" value="0" max="100"></progress></div>
+        <button id="exportButton" type="button">Export JSONL</button>
+        <button id="exitButton" type="button">Exit</button>
+      </footer>
+    </main>
+
+    <main id="completionView" class="centered-view hidden" tabindex="-1">
+      <section class="completion-panel">
+        <p class="eyebrow">Verification complete</p>
+        <h1>All ads have been reviewed.</h1>
+        <p>Your results are saved locally and ready to export.</p>
+        <div class="dataset-summary">
+          <div><strong id="completedCount">0</strong><span>Ads reviewed</span></div>
+          <div><strong id="wrongIdCount">0</strong><span>Wrong identifications</span></div>
+        </div>
+        <p>Session <strong id="completionSession"></strong></p>
+        <div class="completion-actions">
+          <button id="reviewButton" type="button">Review results</button>
+          <button id="completionExportButton" class="primary" type="button">Export JSONL</button>
+          <button id="completionExitButton" type="button">Exit</button>
+        </div>
+      </section>
+    </main>
+
+    <dialog id="sessionDialog">
+      <div class="dialog-body">
+        <p class="eyebrow">Session created</p>
+        <h2>Save this number</h2>
+        <p>Use it to resume this verification later.</p>
+        <strong id="dialogSessionCode" class="session-number"></strong>
+        <div class="dialog-actions">
+          <button id="copySessionButton" type="button">Copy number</button>
+          <button id="continueSessionButton" class="primary" type="button">Continue</button>
+        </div>
+      </div>
+    </dialog>
+
+    <script src="/app.js?v=20260830-brand-correct-completes" defer></script>
+  </body>
+</html>

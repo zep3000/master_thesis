@@ -1,0 +1,630 @@
+schema_version: "1.14"
+title: "Advertisement Face Annotation Flow"
+companion_playbook: "annotation_playbook_v1.md"
+
+scope:
+  intended_for: "Detailed annotation of advertisements containing eligible face depictions."
+  eligible_face: "More than an ear or back of head is visible and the face can be located with a bounding box."
+  included_depictions:
+    - human
+    - illustrated_or_cartoon
+    - artwork_or_statue
+    - mask_mannequin_doll_or_puppet
+    - personified_object
+    - nonhuman_creature
+    - schematic_icon_or_logo
+  excluded_from_this_pass: [brand_name, product_category]
+
+units:
+  hierarchy: [page, advertisement, identity_group, person_or_group]
+  coordinate_format: normalized_xyxy_relative_to_full_page
+  bbox_range: [0.0, 1.0]
+  face_bbox_convention: >-
+    Draw the smallest box that covers all visible face and head features needed
+    for coding, including visible hair, ears, forehead, cheeks, chin, beard or
+    moustache, and face-worn items such as glasses. Exclude neck, shoulders,
+    captions, labels, and empty background unless they visibly cover or cut
+    across the face.
+
+answer_semantics:
+  forced_best_fit: "When relevant visual evidence is available, select exactly one best-fitting substantive category, including near category boundaries."
+  not_assessable: "Use only when required visual evidence is missing, occluded, too small, cropped, or degraded enough to prevent a meaningful best estimate."
+  other: "Use only when the visible observation is clear but absent from the supplied taxonomy; never use as an uncertainty response."
+  uncertainty_labels_available: false
+
+llm_instruction: >-
+  Select exactly one best-fitting substantive category whenever the relevant visual
+  evidence is available. When a case lies near a category boundary, choose the
+  category with slightly stronger visual support. Do not return an uncertainty
+  label. Use not_assessable only when missing, occluded, too-small, cropped, or
+  degraded evidence prevents a meaningful best estimate. Use other only when the
+  visible observation is clear but absent from the provided taxonomy. When
+  individual face_expression_legibility is 0_not_legible, leave gaze and smile
+  fields null. When group expression_legibility_distribution is
+  all_0_not_legible, leave group gaze and smile fields null.
+  For expression legibility, judge the overall ability to code the visible
+  expression. The same score may result from limited detail, covering or occlusion,
+  face orientation, small face size, blur, low contrast, or poor reproduction quality.
+
+global_actions:
+  urgent_comment:
+    available_during: all_nonterminal_steps
+    ui: persistent_action
+    label: "Urgent comment"
+    opens: URGENT_COMMENT
+
+enums:
+  yes_no: ["yes", "no"]
+  depiction_type:
+    - photo_of_person
+    - naturalistic_illustration
+    - stylized_illustration
+    - cartoon_or_caricature
+    - generic_human_figure
+    - photo_of_artwork_or_statue
+    - drawing_of_statue_monument_or_public_symbol
+    - mask_mannequin_doll_or_puppet
+    - personified_object
+    - nonhuman_creature_with_face
+    - schematic_icon_or_logo_face
+    - multiple_types_present
+  person_depiction_type:
+    - photo_of_person
+    - naturalistic_illustration
+    - stylized_illustration
+    - cartoon_or_caricature
+    - generic_human_figure
+    - photo_of_artwork_or_statue
+    - drawing_of_statue_monument_or_public_symbol
+    - mask_mannequin_doll_or_puppet
+    - personified_object
+    - nonhuman_creature_with_face
+    - schematic_icon_or_logo_face
+  individual_age:
+    - infant
+    - child
+    - adolescent
+    - young_adult
+    - middle_adult
+    - older_adult
+    - not_assessable
+  gender_presentation:
+    - feminine
+    - masculine
+    - ambiguous_or_androgynous
+    - not_assessable
+  face_orientation:
+    - beyond_profile
+    - profile
+    - three_quarter
+    - frontal
+    - tilted_down
+    - tilted_up
+    - not_assessable
+  face_expression_legibility:
+    - 0_not_legible
+    - 1_low_legibility
+    - 2_moderate_legibility
+    - 3_high_legibility
+  gaze_target:
+    - viewer_camera
+    - another_person
+    - advertised_product
+    - other_object
+    - off_frame_or_scene_direction
+    - eyes_covered
+    - closed_eyes
+    - not_assessable
+  mouth_covered: ["no", "yes", partly, not_assessable]
+  mouth_covering:
+    - hand
+    - beard
+    - other_body_part
+    - part_of_another_person
+    - object
+    - object_in_mouth
+    - text_or_graphic_overlay
+    - other
+    - not_assessable
+  smile_presence: ["yes", "no", not_assessable]
+  smile_intensity: [1_slight, 2_clear, 3_broad, 4_laughter_like]
+  group_type:
+    - interacting_group
+    - posed_group
+    - audience_or_crowd
+    - background_population
+    - separate_portraits_or_composite
+  group_age_composition:
+    - young_only
+    - middle_only
+    - older_only
+    - mostly_young
+    - mostly_middle
+    - mostly_older
+    - mixed
+    - not_assessable
+  group_gender_composition:
+    - feminine_only
+    - masculine_only
+    - mostly_feminine
+    - mostly_masculine
+    - mixed
+    - ambiguous_or_androgynous_present
+    - not_assessable
+  group_expression_legibility:
+    - all_0_not_legible
+    - mostly_0_not_legible
+    - all_1_low_legibility
+    - mostly_1_low_legibility
+    - all_2_moderate_legibility
+    - mostly_2_moderate_legibility
+    - all_3_high_legibility
+    - mostly_3_high_legibility
+    - mixed_legibility
+  group_gaze:
+    - toward_viewer_camera
+    - toward_each_other
+    - toward_object
+    - off_frame_or_scene_direction
+    - mixed
+    - not_assessable
+  group_smile_prevalence:
+    - none
+    - minority
+    - about_half
+    - majority
+    - all
+    - not_assessable
+  group_smile_intensity: [slight, clear, broad_or_laughter_like, mixed]
+
+flow:
+  start: P1_qualifying_ad_count
+  phases:
+    - page_and_ad_setup
+    - process_each_ad_fully_in_order
+  steps:
+    P1_qualifying_ad_count:
+      unit: page
+      field: page.qualifying_ad_count
+      additional_field: page.no_qualifying_ad_reason
+      ui: zero_reason_or_count
+      prompt: "How many advertisements on this page contain at least one eligible face depiction?"
+      zero_reason_values:
+        - no_ads_on_page
+        - ads_present_no_visible_faces
+      constraints: {minimum: 1, maximum: 99}
+      storage:
+        zero_reason:
+          page.qualifying_ad_count: "0"
+          page.no_qualifying_ad_reason: selected_zero_reason
+        positive_count:
+          page.qualifying_ad_count: selected_count
+          page.no_qualifying_ad_reason: null
+      legacy_incomplete:
+        condition: "page.qualifying_ad_count == '0' and page.no_qualifying_ad_reason == null"
+        action: "mark page started and reopen at P1_qualifying_ad_count"
+      transitions:
+        "value in ['no_ads_on_page','ads_present_no_visible_faces']": END_PAGE_INELIGIBLE
+        "value == 1": P2_single_ad_full_page
+        "value > 1": DRAW_AD_BOXES
+
+    P2_single_ad_full_page:
+      unit: advertisement
+      field: advertisement.extent
+      ui: single_choice
+      values: [full_page, partial_page]
+      transitions:
+        full_page:
+          actions: [create_full_usable_page_bbox]
+          next: PREPARE_ADS
+        partial_page: A1_ad_bbox
+
+    A1_ad_bbox:
+      unit: advertisement
+      field: advertisement.bbox
+      ui: draw_bbox
+      required: true
+      next: PREPARE_ADS
+
+    DRAW_AD_BOXES:
+      unit: page
+      collection: advertisements
+      count_from: page.qualifying_ad_count
+      ui: draw_bbox_collection
+      required: true
+      next: PREPARE_ADS
+
+    PREPARE_ADS:
+      kind: iterator
+      collection_from: advertisements
+      ordering: "After all advertisement boxes are drawn, finish each advertisement completely before moving to the next advertisement."
+      item_start: A2_ad_depiction_type
+      item_end: END_AD_DETAILS
+      after: END_PAGE_COMPLETE
+
+    A2_ad_depiction_type:
+      unit: advertisement
+      field: advertisement.depiction_type
+      ui: single_choice
+      values_from: depiction_type
+      prompt: "How are the eligible faces in this advertisement depicted?"
+      next: A3_face_depiction_count
+
+    A3_face_depiction_count:
+      implementation_id: A3_unique_person_count
+      unit: advertisement
+      field: advertisement.face_depiction_count_band
+      ui: draw_bbox_collection_or_crowd_choice
+      prompt: "Draw a box around every eligible face depiction."
+      instruction: "Keep Only individuals selected and draw 1-9 boxes, or choose 10-20 or 20+ for a crowd."
+      route_choices:
+        - only_individuals
+        - 10_20
+        - 20_plus
+      route_storage_note: "only_individuals is a UI route only; the stored field is derived from drawn face-box count."
+      direct_drawing:
+        create_unit: person_candidate
+        field: face_bbox
+        minimum: 1
+        maximum: 9
+        include_duplicate_depictions: true
+        derive_field_value_from: "count(drawn face boxes)"
+      crowd_choices: ["10_20", "20_plus"]
+      transitions:
+        "1 <= count(drawn face boxes) <= 9": START_DUPLICATE_RESOLUTION
+        "value in ['10_20','20_plus']": C1_outstanding_present
+
+    C1_outstanding_present:
+      unit: advertisement
+      field: advertisement.has_outstanding_individuals
+      ui: single_choice
+      values_from: yes_no
+      transitions:
+        "yes": DRAW_OUTSTANDING_INDIVIDUAL_BOXES
+        "no": DRAW_GROUP_BOXES
+
+    DRAW_OUTSTANDING_INDIVIDUAL_BOXES:
+      unit: advertisement
+      create_unit: person_candidate
+      set_on_create: {annotation_role: outstanding_individual}
+      field: face_bbox
+      ui: draw_bbox_until_done
+      instruction: "Choose Done only after every outstanding individual face has a box."
+      after: DRAW_GROUP_BOXES
+
+    DRAW_GROUP_BOXES:
+      unit: advertisement
+      create_unit: group
+      field: bbox
+      ui: draw_bbox_until_done
+      after: START_DUPLICATE_RESOLUTION
+
+    START_DUPLICATE_RESOLUTION:
+      kind: conditional
+      scope: advertisement
+      transitions:
+        "count(individually boxed faces in current advertisement) < 2": START_DETAIL_CODING
+        otherwise: D0_duplicates_present
+
+    D0_duplicates_present:
+      unit: advertisement
+      field: advertisement.duplicate_faces_present
+      ui: single_choice
+      values_from: yes_no
+      transitions:
+        "no":
+          actions: [make_each_box_a_canonical_person]
+          next: START_DETAIL_CODING
+        "yes": D1_unique_face_count
+
+    D1_unique_face_count:
+      unit: advertisement
+      field: advertisement.unique_face_count
+      ui: bounded_integer_buttons
+      constraints:
+        minimum: 1
+        maximum: "count(individually boxed faces in current advertisement) - 1"
+      next: LOOP_IDENTITY_GROUPS
+
+    LOOP_IDENTITY_GROUPS:
+      kind: iterator
+      count_from: advertisement.unique_face_count
+      create_unit: face_identity_group
+      scope: advertisement
+      item_start: D2_select_main
+      item_end: END_IDENTITY_GROUP
+      after: START_DETAIL_CODING
+
+    D2_select_main:
+      unit: face_identity_group
+      field: main_person_id
+      ui: click_unassigned_person_bbox
+      prompt: "Select the main face for this identity."
+      required: true
+      next: D3_select_duplicates
+
+    D3_select_duplicates:
+      unit: face_identity_group
+      field: duplicate_person_ids
+      ui: click_zero_or_more_unassigned_person_bboxes
+      prompt: "Select every duplicate of this main face."
+      validation: "After the final group, every individually boxed face belongs to exactly one identity group."
+      next: END_IDENTITY_GROUP
+
+    START_DETAIL_CODING:
+      kind: scoped_sequence
+      scope: current_advertisement
+      item_start: LOOP_CANONICAL_PEOPLE
+      item_end: END_AD_DETAILS
+      after: NEXT_AD_OR_END_PAGE
+
+    LOOP_CANONICAL_PEOPLE:
+      kind: iterator
+      collection_from: "advertisement.people[duplicate_of_person_id == null]"
+      item_start:
+        condition: "advertisement.depiction_type == 'multiple_types_present'"
+        then: I0_person_depiction_type
+        otherwise: I1_age
+      item_end: END_PERSON
+      after: LOOP_GROUP_DETAILS
+
+    I0_person_depiction_type:
+      unit: person
+      field: depiction_type
+      ui: single_choice
+      values_from: person_depiction_type
+      next: I1_age
+
+    I1_age:
+      unit: person
+      field: perceived_age
+      ui: single_choice
+      values_from: individual_age
+      next: I2_gender
+
+    I2_gender:
+      unit: person
+      field: perceived_gender_presentation
+      ui: single_choice
+      values_from: gender_presentation
+      next: I4_expression_legibility
+
+    I4_expression_legibility:
+      unit: person
+      field: face_expression_legibility
+      ui: ordinal_single_choice
+      values_from: face_expression_legibility
+      coding_rule: >-
+        Score the overall result for expression coding, not the cause of reduced
+        legibility. Low, moderate, or high legibility can arise from one or more
+        different limitations. Judge their combined effect; do not count causes
+        or apply a fixed penalty for the presence of any single cause.
+      possible_limiting_factors:
+        - limited_or_missing_facial_detail
+        - covering_or_occlusion
+        - face_orientation_or_tilt
+        - small_face_size
+        - blur_or_poor_focus
+        - low_contrast
+        - degraded_or_poor_reproduction_quality
+      transitions:
+        0_not_legible:
+          actions: [clear_gaze_fields, clear_smile_fields, set_skip_gaze_and_smile]
+          next: I3_orientation
+        otherwise: I3_orientation
+
+    I3_orientation:
+      unit: person
+      field: face_orientation
+      ui: single_choice
+      values_from: face_orientation
+      transitions:
+        "person.face_expression_legibility == '0_not_legible'": I6_mouth_covered
+        otherwise: I5_gaze_target
+
+    I5_gaze_target:
+      unit: person
+      field: gaze_target
+      ui: single_choice
+      values_from: gaze_target
+      required_target_reference_for:
+        another_person:
+          ui: click_existing_person_bbox_or_unboxed_button
+          canonicalize_duplicate_target: true
+          bbox_field: gaze_target_person_id
+          unboxed_field: gaze_target_person_unboxed
+          auto_advance_on_unboxed_button: true
+      next: I6_mouth_covered
+
+    I6_mouth_covered:
+      unit: person
+      field: mouth_covered
+      ui: single_choice
+      values_from: mouth_covered
+      transitions:
+        "value in ['yes','partly']": I7_mouth_covering
+        "value in ['no','not_assessable'] and person.face_expression_legibility == '0_not_legible'": END_PERSON
+        "value in ['no','not_assessable']": I8_smile_present
+
+    I7_mouth_covering:
+      unit: person
+      field: mouth_covering
+      ui: single_choice
+      values_from: mouth_covering
+      transitions:
+        other: I7_covering_other_text
+        "person.face_expression_legibility == '0_not_legible'": END_PERSON
+        otherwise: I8_smile_present
+
+    I7_covering_other_text:
+      unit: person
+      field: mouth_covering_other_text
+      ui: required_short_text
+      maximum_length: 240
+      transitions:
+        "person.face_expression_legibility == '0_not_legible'": END_PERSON
+        otherwise: I8_smile_present
+
+    I8_smile_present:
+      unit: person
+      field: smile_present
+      ui: single_choice
+      values_from: smile_presence
+      transitions:
+        "yes": I9_smile_intensity
+        "value in ['no','not_assessable']": END_PERSON
+
+    I9_smile_intensity:
+      unit: person
+      field: smile_intensity
+      ui: ordinal_single_choice
+      values_from: smile_intensity
+      next: END_PERSON
+
+    LOOP_GROUP_DETAILS:
+      kind: iterator
+      collection_from: advertisement.groups
+      item_start: G1_group_type
+      item_end: END_GROUP
+      after: END_AD_DETAILS
+
+    G1_group_type:
+      unit: group
+      field: group_type
+      ui: single_choice
+      values_from: group_type
+      next: G2_group_age
+
+    G2_group_age:
+      unit: group
+      field: age_composition
+      ui: single_choice
+      values_from: group_age_composition
+      next: G3_group_gender
+
+    G3_group_gender:
+      unit: group
+      field: gender_presentation_composition
+      ui: single_choice
+      values_from: group_gender_composition
+      next: G4_group_expression_legibility
+
+    G4_group_expression_legibility:
+      unit: group
+      field: expression_legibility_distribution
+      ui: single_choice
+      values_from: group_expression_legibility
+      coding_rule: >-
+        Code the distribution of expression-coding legibility across the boxed
+        group. Use all_* when all or nearly all faces share the same level,
+        mostly_* when one level clearly predominates with visible exceptions,
+        and mixed_legibility when no single level clearly predominates. Score
+        the overall result, not the cause of reduced legibility.
+      possible_limiting_factors:
+        - limited_or_missing_facial_detail
+        - covering_or_occlusion
+        - face_orientation_or_tilt
+        - small_face_size
+        - blur_or_poor_focus
+        - low_contrast
+        - degraded_or_poor_reproduction_quality
+      transitions:
+        all_0_not_legible:
+          actions: [clear_group_gaze_fields, clear_group_smile_fields, set_skip_group_gaze_and_smile]
+          next: END_GROUP
+        otherwise: G5_group_gaze
+
+    G5_group_gaze:
+      unit: group
+      field: dominant_gaze
+      ui: single_choice
+      values_from: group_gaze
+      next: G6_group_smile
+
+    G6_group_smile:
+      unit: group
+      field: smile_prevalence
+      ui: single_choice
+      values_from: group_smile_prevalence
+      transitions:
+        "value in ['none','not_assessable']": END_GROUP
+        otherwise: G7_group_smile_intensity
+
+    G7_group_smile_intensity:
+      unit: group
+      field: dominant_smile_intensity
+      ui: single_choice
+      values_from: group_smile_intensity
+      next: END_GROUP
+
+    URGENT_COMMENT:
+      unit: current_context
+      field: urgent_comments[]
+      ui: optional_free_text_modal
+      store_context: [page_id, advertisement_id, group_id_if_active, person_id_if_active, interrupted_step_id]
+      on_save:
+        actions: [add_review_flag]
+        next: RETURN_TO_INTERRUPTED_STEP
+      on_cancel: RETURN_TO_INTERRUPTED_STEP
+
+    END_IDENTITY_GROUP: {kind: return}
+    END_PERSON: {kind: return}
+    END_GROUP: {kind: return}
+    END_AD_DETAILS: {kind: return}
+    NEXT_AD_OR_END_PAGE: {kind: advance_to_next_ad_or_terminal_page_complete}
+    RETURN_TO_INTERRUPTED_STEP: {kind: return}
+    END_PAGE_INELIGIBLE: {kind: terminal, status: ineligible}
+    END_PAGE_COMPLETE: {kind: terminal, status: complete}
+
+storage:
+  page_fields: [qualifying_ad_count, no_qualifying_ad_reason, duplicate_faces_present, unique_face_count]
+  advertisement_duplicate_fields: [duplicate_faces_present, unique_face_count]
+  advertisement_depiction_field: depiction_type
+  identity_group_fields: [identity_group_id, scope_ad_id, main_person_id, duplicate_person_ids]
+  group_expression_legibility_field: expression_legibility_distribution
+  person_duplicate_fields: [duplicate_of_person_id, duplicate_person_ids]
+  depiction_inheritance: "When advertisement.depiction_type is not multiple_types_present, it applies to every person in that advertisement and person.depiction_type remains null."
+
+validation_rules:
+  - id: all_boxes_normalized
+    assert: "all bbox coordinates satisfy 0 <= x1 < x2 <= 1 and 0 <= y1 < y2 <= 1"
+  - id: exact_small_face_count_is_derived
+    assert: "advertisement.face_depiction_count_band not in ['1','2','3','4','5','6','7','8','9'] or integer(advertisement.face_depiction_count_band) == count(advertisement.people[annotation_role == 'individual' and face_bbox != null])"
+  - id: full_page_bbox_is_automatic
+    assert: "advertisement.extent != 'full_page' or advertisement.bbox_source == 'automatic_full_usable_page'"
+  - id: zero_count_requires_reason
+    assert: "page.qualifying_ad_count != '0' or page.no_qualifying_ad_reason in ['no_ads_on_page','ads_present_no_visible_faces']"
+  - id: duplicate_groups_partition_individual_boxes
+    assert: "when advertisement.duplicate_faces_present == 'yes', every boxed person id in that advertisement occurs exactly once across same-ad identity-group main and duplicate ids"
+  - id: only_canonical_people_receive_details
+    assert: "person.duplicate_of_person_id != null implies detailed person fields are null"
+  - id: multiple_ad_types_require_person_type
+    assert: "advertisement.depiction_type != 'multiple_types_present' or every canonical person in that advertisement has depiction_type"
+  - id: positive_smile_has_intensity
+    assert: "person.smile_present != 'yes' or person.smile_intensity != null"
+  - id: zero_legibility_skips_gaze_and_smile
+    assert: "person.face_expression_legibility != '0_not_legible' or (person.gaze_target == null and person.smile_present == null and person.smile_intensity == null)"
+  - id: all_zero_group_legibility_skips_gaze_and_smile
+    assert: "group.expression_legibility_distribution != 'all_0_not_legible' or (group.dominant_gaze == null and group.smile_prevalence == null and group.dominant_smile_intensity == null)"
+  - id: nonpositive_smile_has_no_intensity
+    assert: "person.smile_present == 'yes' or person.smile_intensity == null"
+  - id: covered_mouth_requires_covering
+    assert: "person.mouth_covered not in ['yes','partly'] or person.mouth_covering != null"
+  - id: another_person_gaze_requires_target_person
+    assert: "person.gaze_target != 'another_person' or person.gaze_target_person_id != null or person.gaze_target_person_unboxed == true"
+  - id: no_uncertainty_labels
+    assert: "no active enum or saved answer uses an uncertainty fallback"
+
+excluded_variables_v1_6:
+  - brand_name
+  - product_category
+  - felt_emotion
+  - genuine_or_fake_smile
+  - duchenne_smile
+  - smile_social_function
+  - intentional_covering
+  - exact_head_pose_degrees
+  - race_or_ethnicity
+  - actual_gender_identity
+  - exact_age
+  - per_duplicate_detailed_person_coding
