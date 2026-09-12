@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "source_root": "qwen_iteration",
+  "included_first_party_source_files": 111,
+  "included_accounting_notebooks": 1,
+  "transformations": [
+    "Machine-specific absolute paths were replaced by relative or environment-backed paths.",
+    "The accounting notebook was adapted to release-asset extraction and kept output-free."
+  ],
+  "excluded_source_files": [
+    {
+      "path": "canonical_candidate_280/render_report.py",
+      "reason": "Dedicated narrative generator with hardcoded conclusions and recommendations."
+    },
+    {
+      "path": "first100_pipeline_matrix/report.py",
+      "reason": "Dedicated narrative generator with hardcoded conclusions and recommendations."
+    },
+    {
+      "path": "next_round_200/render_report.py",
+      "reason": "Dedicated narrative generator with hardcoded conclusions and recommendations."
+    },
+    {
+      "path": "final_pipeline_standalone/analyze_provider_comparison.py",
+      "reason": "Embeds the substantive provider-comparison interpretation and recommendation."
+    },
+    {
+      "path": "final_pipeline_standalone/compare_no_tiles.py",
+      "reason": "Embeds the substantive ablation interpretation and production recommendation."
+    },
+    {
+      "path": "venice_first30_single_shot/evaluate_venice_vs_human_79201188.py",
+      "reason": "Embeds a completed interpretive assessment rather than only calculated labels."
+    },
+    {
+      "path": "compare_venice_runs_vs_human_79201188.py",
+      "reason": "Embeds a completed comparison narrative."
+    },
+    {
+      "path": "compare_venice_first30_strict_loose_legibility.py",
+      "reason": "Dedicated report generator containing fixed explanatory narrative."
+    },
+    {
+      "path": "evaluate_first20_against_gold.py",
+      "reason": "Dedicated report generator containing fixed explanatory narrative."
+    }
+  ],
+  "excluded_trees": [
+    {
+      "path": "category_taxonomy_reuse/sources/MAdVerse",
+      "reason": "Vendored third-party source and assets require separate license review."
+    },
+    {
+      "path": "**/__pycache__",
+      "reason": "Generated interpreter cache."
+    }
+  ]
+}

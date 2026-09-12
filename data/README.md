@@ -92,10 +92,12 @@ excluded):
 
 Human annotation files were produced during this study with the included
 sampling notebooks and local annotation tooling; they are not third-party
-datasets. Model-result JSONL files were likewise generated locally from the
-licensed page images. Both categories can contain coder/task identifiers,
-free-text comments, image identifiers, or other research records and remain
-excluded.
+datasets and remain excluded. Model-result JSONL files were likewise generated
+locally from the licensed page images. Reviewed model-only pipeline artifacts
+may be distributed as GitHub release assets indexed by
+`artifacts/pipeline/manifest.json`; they are not tracked as ordinary Git data.
+The release archives exclude source imagery, human/gold records, credentials,
+local logs, and machine-specific paths.
 
 The evaluation preparation notebook expects its source JSONL files under:
 

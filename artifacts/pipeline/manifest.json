@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "release_tag": "pipeline-documentation-2026-09-12",
+  "assets": [
+    {
+      "name": "pipeline-iterations-artifacts.zip",
+      "scope": "development iterations",
+      "files": 8270,
+      "uncompressed_bytes": 60244389,
+      "archive_bytes": 9959373,
+      "sha256": "b7041671dd87994545c8d34ce4933fc1021b24367e4359d744e3a220ba45b151",
+      "url": "https://github.com/zep3000/master_thesis/releases/download/pipeline-documentation-2026-09-12/pipeline-iterations-artifacts.zip"
+    },
+    {
+      "name": "pipeline-final-artifacts.zip",
+      "scope": "final validation and production pipeline",
+      "files": 290,
+      "uncompressed_bytes": 409226449,
+      "archive_bytes": 20648274,
+      "sha256": "07bffb28758150d7525fb276b03887229439a184678f3165e99649b04306a5d1",
+      "url": "https://github.com/zep3000/master_thesis/releases/download/pipeline-documentation-2026-09-12/pipeline-final-artifacts.zip"
+    }
+  ]
+}
