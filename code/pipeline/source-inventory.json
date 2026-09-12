@@ -1,11 +1,12 @@
 {
   "schema_version": 1,
   "source_root": "qwen_iteration",
-  "included_first_party_source_files": 111,
+  "included_first_party_source_files": 113,
   "included_accounting_notebooks": 1,
   "transformations": [
     "Machine-specific absolute paths were replaced by relative or environment-backed paths.",
-    "The accounting notebook was adapted to release-asset extraction and kept output-free."
+    "The accounting notebook was adapted to release-asset extraction and kept output-free.",
+    "A tested complete-case cleanup utility documents and removes the three reviewed incomplete production pages without invoking inference."
   ],
   "excluded_source_files": [
     {
