@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/annotation-app-v2/annotation_app_manifest_schema_v1.json",
+  "title": "Annotation App V2 Manifest",
+  "description": "Preferred manifest format for Annotation App V2. Hosted mode ignores image path values; local mode requires absolute image paths.",
+  "type": "object",
+  "required": ["task_id", "images"],
+  "additionalProperties": true,
+  "properties": {
+    "task_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120,
+      "description": "Stable identifier for the annotation task or set."
+    },
+    "block_size": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Optional number of pages per work block. When omitted, the assignment is shown as one continuous task."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional manifest-level metadata."
+    },
+    "images": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["filename"],
+        "additionalProperties": true,
+        "properties": {
+          "image_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160,
+            "description": "Stable page/image identifier. If omitted by the app, it is inferred from filename, but explicit IDs are recommended."
+          },
+          "filename": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "pattern": "^[^/\\\\]+\\.jpe?g$",
+            "description": "JPEG filename without directory components."
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Absolute image path for local mode. Ignored in hosted mode."
+          },
+          "page_type": {
+            "type": "string",
+            "enum": ["single", "double", "unknown"],
+            "default": "unknown"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Optional image-level metadata."
+          }
+        }
+      }
+    }
+  }
+}

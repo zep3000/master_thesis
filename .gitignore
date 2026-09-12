@@ -1,0 +1,28 @@
+.venv/
+.vscode/
+.ipython/
+.jupyter/
+.quarto/
+__pycache__/
+*.py[cod]
+node_modules/
+*.log
+.env
+.env.*
+!.env.example
+
+# Local authentication material used by archive-download notebooks.
+code/auth/
+
+# The source archive, human annotations, and derived row-level data are not
+# distributed from this repository. See data/README.md.
+data/*
+!data/README.md
+
+# Local application inputs and annotation exports.
+annotation_app_bboxes_full_issues/data/
+annotation_app_bboxes_full_issues/test_assets/
+
+# Generated table fragments are manuscript content and remain private unless
+# they are reviewed and explicitly allowlisted later.
+code/output/tables/

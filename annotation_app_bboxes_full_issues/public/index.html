@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Full-Issue Bounding-Box Annotation</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Full-issue PDF face annotation</div>
+          <h1>Issue PDF annotator</h1>
+        </div>
+        <div class="topbar-actions">
+          <label class="file-picker">
+            <span>Load issue PDF</span>
+            <input id="pdfInput" type="file" accept="application/pdf">
+          </label>
+          <button id="exportCsvButton" type="button" disabled>Export CSV</button>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <section class="viewer-panel">
+          <div class="toolbar">
+            <button id="prevPageButton" type="button" disabled>Previous</button>
+            <button id="nextPageButton" type="button" disabled>Next</button>
+            <span id="pageStatus" class="status-pill">No PDF loaded</span>
+            <span id="modifierStatus" class="status-pill neutral">BBox mode: analyzable yes</span>
+            <span id="autosaveStatus" class="status-pill">Autosave idle</span>
+            <span class="spacer"></span>
+            <button id="clearPageButton" type="button" disabled>Clear page boxes</button>
+          </div>
+
+          <div class="canvas-scroll">
+            <div id="canvasWrap" class="canvas-wrap">
+              <canvas id="pdfCanvas"></canvas>
+              <svg id="overlay" class="overlay"></svg>
+            </div>
+          </div>
+        </section>
+
+        <aside class="sidebar">
+          <section class="panel">
+            <h2>Instructions</h2>
+            <ul class="instruction-list">
+              <li>Use left and right arrow keys to switch pages.</li>
+              <li>Draw a box with the mouse to save one face row.</li>
+              <li>Hold `Ctrl` while drawing to save `analyzable = no`.</li>
+              <li>Right click while drawing to abort the current box.</li>
+              <li>Issue page is exported as `pdf page - 1`.</li>
+            </ul>
+          </section>
+
+          <section class="panel">
+            <h2>Current page</h2>
+            <div id="pageSummary" class="page-summary">No page loaded.</div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <h2>Saved boxes</h2>
+              <span id="boxCount" class="count-pill">0</span>
+            </div>
+            <div id="annotationList" class="annotation-list empty">No boxes on this page.</div>
+          </section>
+        </aside>
+      </main>
+    </div>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

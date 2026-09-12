@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "description": "Versioned figure artifacts for verified downstream use.",
+  "files": [
+    {
+      "name": "face_detection_confidence_by_decade.svg",
+      "sha256": "9cc3390a6b57a3c3693044532f8ea0bc205db242f89d03c48233bb59217fc87f",
+      "bytes": 55451
+    },
+    {
+      "name": "faces-deduplication-analysis.svg",
+      "sha256": "9b7119b431d260422d8f16c612b1e9ae68fd2c74713d0b4f81bbaec821836c87",
+      "bytes": 72467
+    },
+    {
+      "name": "faces_pages_by_decade.svg",
+      "sha256": "13b9f8830ad5a1353b7887108248d5f516b19cd862b8e98f95a1a8b1b50e5e75",
+      "bytes": 103841
+    },
+    {
+      "name": "faces_per_issue_decade_summary.svg",
+      "sha256": "21cc139b4c24d2a4b0740c5599343955dab89ebeff23e4c1523d341d3692957d",
+      "bytes": 1422156
+    },
+    {
+      "name": "issues_with_detected_faces.svg",
+      "sha256": "b3cc89759438b78fb013558fc17d19057c82acd9e6867a0b474f780f2b2df3d3",
+      "bytes": 82407
+    }
+  ]
+}

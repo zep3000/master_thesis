@@ -1,0 +1,16 @@
+{
+  "name": "annotation-app-bboxes-full-issues",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Full-issue PDF face bounding-box annotation app with CSV export.",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "pdfjs-dist": "^4.10.38"
+  }
+}
