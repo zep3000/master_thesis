@@ -142,7 +142,10 @@ repository layout is also recognised. The two notebook sources are
 review copies. Required Python packages are NumPy, pandas, Matplotlib, SciPy,
 statsmodels, patsy, nbformat, nbclient, and ipykernel.
 
-The workflow generates 11 native Quarto tables and 15 aggregate SVG figures.
+The retained chapter contains 9 native Quarto tables and 11 aggregate SVG figures,
+starting with gender and age, then smile presence, intensity, and contextual
+comparisons. Four compact appendix tables transcribe selected plotted decade
+values; they introduce no additional exploratory analyses.
 Tables, executed notebooks, row-level pickles/CSVs, model diagnostics, the
 artifact index, and provenance stay in private/local output storage. Only the
 aggregate figures are eligible for the public checksum-verified figure manifest.
@@ -152,8 +155,20 @@ update the versioned figure interface after verifying the outputs.
 
 Smile denominators use yes/(yes + no); intensity is conditional on smiling.
 Descriptive intervals use 2,000 common issue-bootstrap resamples stratified by
-year. The principal logistic model uses categorical decade-by-gender effects,
-age, industry, depiction type, relative face area and co-presence. A separate
-legibility sensitivity uses levels 2-3 because level 1 has no recorded smiles.
+year, including the four within-gender Spearman correlations. Correlation ranks
+are recalculated in each resample. The principal logistic model uses categorical
+decade-by-gender effects, age, industry, depiction type, relative face area and
+co-presence. Basic, age-adjusted, and fully adjusted specifications use exactly
+the same sample. Model intervals use issue-clustered covariance and the delta
+method, rather than bootstrap refits. Fixed minimum relative face areas (1%, 2%)
+and legibility levels (2+, 3) are tested as sample restrictions.
+
+`chapter06_support.py` writes the compact numerical appendix, exports a numerical
+index, computes rank correlations, and audits the bootstrap. Its audit checks
+within-year cluster counts, explicit repeated-row equivalence, tied ranks, and
+the main interval endpoints against an independent 5,000-resample run. Every
+retained curve/heatmap has exact underlying values under `CH06_WORK/numerical-data`;
+the appendix transcribes only the main decade summaries. The same location's
+README documents units, denominators, suppressed cells, and interval types.
 Row-level data, local kernel specifications and source archive material must
 remain outside the tracked tree.

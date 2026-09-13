@@ -4,8 +4,8 @@
   "files": [
     {
       "name": "ch06-adjusted-trends.svg",
-      "sha256": "6054033e4288e6c341077d9d7a313b0715faea05ffcb27ef59c154f59cf44ee1",
-      "bytes": 31236
+      "sha256": "641abd00d4b25d65846c3cdaf306428afdd838f56dde14cffeb83d1a78af2c9b",
+      "bytes": 31226
     },
     {
       "name": "ch06-age-composition.svg",
@@ -29,13 +29,13 @@
     },
     {
       "name": "ch06-face-size.svg",
-      "sha256": "37257625a64bb50f1cacba58661b0705d0b4764da993a9117dd932b20878ffa4",
-      "bytes": 31291
+      "sha256": "789469b10b50de7904502f40343bbc41d62c0eb1bf6272a9dc7d1ee8ec9cc5e0",
+      "bytes": 31276
     },
     {
       "name": "ch06-gender-intensity.svg",
-      "sha256": "05af4b0bc10b193c166694de6e0395b2af29550a43b90a5b013291320d362f46",
-      "bytes": 24100
+      "sha256": "d700cc3c12bf19cbdd8907f73adbdda3dfad52d6caa9611cdcb41b42f5d5a8ba",
+      "bytes": 35557
     },
     {
       "name": "ch06-gender-representation.svg",
@@ -49,8 +49,8 @@
     },
     {
       "name": "ch06-historical-smiling.svg",
-      "sha256": "e015ee17a70b048a87f550338fdfa3b438cf93f01bc19115c4e64092c770dd88",
-      "bytes": 45207
+      "sha256": "d218631d55dbd96f0bd0702e2ff7318b8eb3102e1a39c931e755fe62f1918c09",
+      "bytes": 35495
     },
     {
       "name": "ch06-industry-standardised.svg",

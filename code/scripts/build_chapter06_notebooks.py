@@ -24,6 +24,7 @@ for base in [Path.cwd(), *Path.cwd().parents]:
 code_dir = next(path for path in candidates if (path / "chapter06_analysis.py").is_file())
 sys.path.insert(0, str(code_dir))
 from chapter06_analysis import Analysis, foundation, gender_age, industry_context, relational, models, finalize
+from chapter06_support import correlations, audit_bootstrap
 
 # CH06_INPUT, CH06_THESIS and CH06_WORK override the local layout defaults.
 c = Analysis()
@@ -54,13 +55,13 @@ def main():
       "chapter06_historical_analysis":notebook("Historical smiling: corpus, gender, age and industry",[
         ("Corpus and historical development","Smile presence uses yes/(yes + no). Other labels remain explicit. Intensity uses smiling faces. Whole issues are resampled within year, using a common seed and 2,000 replicates.","foundation(c)\nc.show(1, 6)"),
         ("Gender and age","Gender differences are feminine minus masculine, reported in percentage points. Age and intensity retain their ordered recorded categories. Sparse age cells are omitted from comparative plots, with counts retained in supporting data.","gender_age(c)\nc.show(7, 12)"),
-        ("Industry and co-presence","Industry standardisation uses six industries with at least 20 assessable faces in each gender and decade from 1950. Observed and standardised lines share the same sample. Ad composition is assigned before dropping unassessable smile records.","industry_context(c)\nc.show(13, 16)"),
+        ("Industry and depiction context","Industry standardisation uses six industries with at least 20 assessable faces in each gender and decade from 1950. Observed and standardised lines share the same sample. Ad composition is assigned before dropping unassessable smile records.","industry_context(c)\nc.show(13, 16)"),
         ("Focused follow-up: the cosmetics exception","The same industry contrast is recomputed separately for photographs and other depictions.","display(pd.read_csv(c.work / 'cosmetics-depiction-followup.csv'))")]),
       "chapter06_relational_analysis":notebook("Relational smiling, visual prominence and adjusted trends",[
         ("Within-ad comparisons and spatial presentation","Adult pairs require exactly two recorded faces, one feminine and one masculine, both adults with assessable smiles. Face area is relative to ad area. Largest-face ownership is compared with each ad's feminine numerical share; exact ties split credit.","relational(c)\nc.show(17, 23)"),
-        ("Adjusted smile trajectories","The main logistic model uses decade-by-gender, age, industry, depiction type, relative face area and co-presence. A separate legibility sensitivity uses levels 2-3 because level 1 has no recorded smiles. Covariance is clustered by issue; marginal-probability intervals use the delta method.","models(c)\nc.show(24, 26)"),
-        ("Focused sensitivity checks","Retain the legibility-outcome cross-tabulation, photographic-pair comparison and alternative size thresholds as supporting results.","display(pd.read_csv(c.work / 'legibility-smile-detail.csv'))\ndisplay(pd.read_csv(c.work / 'dyad-photo-followup.csv'))\ndisplay(pd.read_csv(c.work / 'prominence-threshold-sensitivity.csv'))"),
-        ("Model and artifact checks","Check convergence, model sample sizes and the complete 26-artifact inventory. Source notebooks remain output-free in Git; executed copies stay in private output storage.","display(pd.read_csv(c.work / 'model-fit.csv'))\nfinalize(c)")])}
+        ("Adjusted smile trajectories","The main logistic model uses decade-by-gender, age, industry, depiction type, relative face area and co-presence. An intermediate model controls age alone; all three specifications share the same sample. Legibility is checked through restricted samples because its labels are strongly coupled to smile presence. Covariance is clustered by issue; marginal-probability intervals use the delta method.","models(c)\nc.show(24, 26)"),
+        ("Simple correlations and bootstrap audit","Four Spearman associations are compared within gender, with the same issue/year bootstrap and ranks recomputed per draw. The audit checks year-wise counts, explicit resampled rows, tied-rank handling and interval stability with an independent 5,000-draw run.","correlations(c)\nc.show(27, 27)\naudit_bootstrap(c)\ndisplay(pd.read_csv(c.work / 'bootstrap-audit.csv'))"),
+        ("Model and artifact checks","Check convergence, model sample sizes and the 20 retained chapter outputs and complete numerical companion. Source notebooks remain output-free in Git; executed copies stay in private output storage.","display(pd.read_csv(c.work / 'model-fit.csv'))\nfinalize(c)")])}
     for name,nb in definitions.items():
         nbformat.validate(nb)
         nbformat.write(nb,HERE/(name+".ipynb"))
