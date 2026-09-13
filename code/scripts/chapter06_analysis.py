@@ -222,6 +222,8 @@ class Analysis:
             if ax.get_label() != "<colorbar>":
                 ax.set_axisbelow(True)
         fig.savefig(self.figdir / (name+".svg"), bbox_inches="tight", metadata={"Date": None})
+        svg_path=self.figdir/(name+".svg")
+        svg_path.write_bytes(svg_path.read_bytes().replace(b"\r\n",b"\n"))
         fig.savefig(self.work / "previews" / (name+".png"), bbox_inches="tight", dpi=160)
         plt.close(fig)
         self.register(dict(order=order, name=name, kind="figure", caption=caption, note=note, file=name+".svg"))

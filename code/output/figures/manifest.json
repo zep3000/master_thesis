@@ -4,78 +4,78 @@
   "files": [
     {
       "name": "ch06-adjusted-trends.svg",
-      "sha256": "77fd9a26278527e427f677330cc7d871ba70801c45163eda23754a7f7950f467",
-      "bytes": 32019
+      "sha256": "6054033e4288e6c341077d9d7a313b0715faea05ffcb27ef59c154f59cf44ee1",
+      "bytes": 31236
     },
     {
       "name": "ch06-age-composition.svg",
-      "sha256": "6ff20bb360031c09c7316ce72a9034fab17f22f548de76e4ef0f2782da307286",
-      "bytes": 47877
+      "sha256": "dde608edc83bd45db8986bf62b0acda9083bd70a8e85924727f03d89b0026f04",
+      "bytes": 47087
     },
     {
       "name": "ch06-age-smile.svg",
-      "sha256": "790a7f317777689545e9e909d49d5c90f0ba4364fc72d74e287a761fd79537db",
-      "bytes": 41661
+      "sha256": "9acb91882fa33a9a6aaada486a4f03d6cd8f8017c04a9a64f6d009da9a209b63",
+      "bytes": 40866
     },
     {
       "name": "ch06-depiction-trends.svg",
-      "sha256": "be1ccc408b1412118a1a59ef3dec5d2cfc969389c9573c53c831a5d1b6c4e831",
-      "bytes": 23440
+      "sha256": "74fa1a689ad5c2d23ccfac14e3af5c99d9c23623fd9731ebf92bed070539be70",
+      "bytes": 22869
     },
     {
       "name": "ch06-dyad-trends.svg",
-      "sha256": "48c3d5633d981c1f5840066413c593805dd17a8fc76790cd3f3e9abfd3e48800",
-      "bytes": 24478
+      "sha256": "6d1493a56a112b2b4aff620a7ce91a2b09cd1e7b8f7bab113011ca43e6ebb63c",
+      "bytes": 23843
     },
     {
       "name": "ch06-face-size.svg",
-      "sha256": "3565a4e6ce7a5222f4978bae450ab8ab83dd1aa971ade9aa60d7ce46a8718c3d",
-      "bytes": 32099
+      "sha256": "37257625a64bb50f1cacba58661b0705d0b4764da993a9117dd932b20878ffa4",
+      "bytes": 31291
     },
     {
       "name": "ch06-gender-intensity.svg",
-      "sha256": "f7b910f797e1903b63be3a70f1a42fec02164eda4601f5289ccd6d97f66a1218",
-      "bytes": 24781
+      "sha256": "05af4b0bc10b193c166694de6e0395b2af29550a43b90a5b013291320d362f46",
+      "bytes": 24100
     },
     {
       "name": "ch06-gender-representation.svg",
-      "sha256": "caacbed0758d44f62cb4b14d7d6b8001fd73d9e229462c4f1e2b27afbece783c",
-      "bytes": 12832
+      "sha256": "0879610ba3c51ac154c14ffa09f8cc4d6cab33d8664f0abdbb08e3fce3b6205a",
+      "bytes": 12473
     },
     {
       "name": "ch06-gender-smile-trends.svg",
-      "sha256": "54419e6b47eb9855fa2348cacf62a0777492c5c2c56c7adf87b6bdc5bbbb72d6",
-      "bytes": 25670
+      "sha256": "46b5b6aa2638384a76bd0834ecb488ff93a2365a0d0f2db136c2714404a9f8df",
+      "bytes": 25039
     },
     {
       "name": "ch06-historical-smiling.svg",
-      "sha256": "4a6ccddc88ae818c5f9bf35fdcf8c27fe1f9821c0392c295587a62611621347f",
-      "bytes": 46210
+      "sha256": "e015ee17a70b048a87f550338fdfa3b438cf93f01bc19115c4e64092c770dd88",
+      "bytes": 45207
     },
     {
       "name": "ch06-industry-standardised.svg",
-      "sha256": "deec4e401b16b6a5005a3443889ba373659d3e6822d85e9a60da5ba94d9a0aa4",
-      "bytes": 27385
+      "sha256": "23381e1d605f0f4cf2d1a49fbdbddd1425219b15b2fc84c6890a2cfd2927dd86",
+      "bytes": 26718
     },
     {
       "name": "ch06-industry-trends.svg",
-      "sha256": "6c036dd019cb77b74d0b5012b053f504ea05f37bcad6b07af69527ab1458f265",
-      "bytes": 54716
+      "sha256": "4a3678bdd0a4926be682dee37289da829a40d631ddd2608552f7096ae35ff414",
+      "bytes": 53294
     },
     {
       "name": "ch06-legibility.svg",
-      "sha256": "918959bc897595a8140e2445821991ceeb9a20f5212f36fa92730e77a20873be",
-      "bytes": 33024
+      "sha256": "5c83d91db16a0414b41aaa138ed84ecea59dcfeb7f333885bf97ae084669b92e",
+      "bytes": 32180
     },
     {
       "name": "ch06-prominence-smile.svg",
-      "sha256": "38e465d4db9968af077fc28b466c691a575a0cbcb752948a629c56aa86e82729",
-      "bytes": 18103
+      "sha256": "7098d5689348ca6102b6d24927edbc96b54552c0ff9848e088f6baedc560a14f",
+      "bytes": 17686
     },
     {
       "name": "ch06-size-position.svg",
-      "sha256": "4bdddcc91fda7797f307227080e1d57822d65b1ac364880e35aa0fc76633eb99",
-      "bytes": 42529
+      "sha256": "1891d3f0e39343c8c51ca179a0fe47284460a000d14d95658cd7ceefeeffc3c8",
+      "bytes": 41871
     },
     {
       "name": "face_detection_confidence_by_decade.svg",
