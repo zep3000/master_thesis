@@ -124,3 +124,36 @@ data/
 
 Create these directories locally or link them to a separately backed-up data
 store. Never force-add their contents to Git.
+
+## Chapter 06: historical and relational smile analyses
+
+`code/scripts/chapter06_analysis.py` consumes the cleaned page-level JSONL
+`processed/llm-annotations/individual-only/llm-annotations-individual-ads-only.jsonl`
+and its neighbouring `llm-annotations-people-area-ad-cleaning-log.csv`.
+The input excludes entire advertisements containing people areas; it preserves
+page/spread records with no remaining advertisements. The analysis rejects
+non-regular individual annotations and never uses face orientation or gaze.
+
+Configure `CH06_INPUT`, `CH06_THESIS`, and `CH06_WORK`, or supply the corresponding
+`--input`, `--thesis`, and `--work` command-line arguments. The local paired
+repository layout is also recognised. The two notebook sources are
+`chapter06_historical_analysis.ipynb` and `chapter06_relational_analysis.ipynb`.
+`build_chapter06_notebooks.py --execute` builds them and creates executed private
+review copies. Required Python packages are NumPy, pandas, Matplotlib, SciPy,
+statsmodels, patsy, nbformat, nbclient, and ipykernel.
+
+The workflow generates 11 native Quarto tables and 15 aggregate SVG figures.
+Tables, executed notebooks, row-level pickles/CSVs, model diagnostics, the
+artifact index, and provenance stay in private/local output storage. Only the
+aggregate figures are eligible for the public checksum-verified figure manifest.
+Committed notebook outputs and attachments remain empty. Use `--integrate` to
+append the generated structure after existing chapter notes and `--manifest` to
+update the versioned figure interface after verifying the outputs.
+
+Smile denominators use yes/(yes + no); intensity is conditional on smiling.
+Descriptive intervals use 2,000 common issue-bootstrap resamples stratified by
+year. The principal logistic model uses categorical decade-by-gender effects,
+age, industry, depiction type, relative face area and co-presence. A separate
+legibility sensitivity uses levels 2-3 because level 1 has no recorded smiles.
+Row-level data, local kernel specifications and source archive material must
+remain outside the tracked tree.
