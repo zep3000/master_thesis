@@ -213,6 +213,22 @@ class Analysis:
         _, qmd = export_quarto_table(df, name, caption=caption, label="tbl-"+name,
             note=note, formats=formats or {}, data_dir=self.work, qmd_dir=self.tabledir,
             alignments={c: "right" for c in df.columns[1:]})
+        # Give intervals and long labels room in the native thesis tables.
+        # Equal-width columns otherwise split short intervals across three lines.
+        widths = {
+            8: [12, 8, 24, 8, 24, 24],
+            13: [29, 9, 11, 11, 11, 29],
+            21: [12, 8, 10, 10, 10, 10, 12, 28],
+            23: [18, 8, 10, 13, 13, 38],
+            24: [12, 10, 11, 11, 28, 28],
+            26: [29, 9, 22, 10, 10, 20],
+        }
+        if order in widths:
+            columns = ",".join(map(str, widths[order]))
+            text = qmd.read_text(encoding="utf-8")
+            text = text.replace("{#tbl-" + name + "}",
+                                "{#tbl-" + name + ' tbl-colwidths="[' + columns + ']"}')
+            qmd.write_text(text, encoding="utf-8", newline="\n")
         self.register(dict(order=order, name=name, kind="table", caption=caption, note=note,
                            file=qmd.name, rows=len(df)))
 
@@ -636,10 +652,10 @@ def relational(c):
             familyrows.append([gender.capitalize(),len(q),q.children.sum(),q.same.mean(),q.other.mean(),f"{v['estimate']:+.3f} [{v['low']:.3f}, {v['high']:.3f}]"])
     else:
         familyrows=[["No eligible cases",0,0,np.nan,np.nan,"—"]]
-    c.table(23,"adult-child-proximity",pd.DataFrame(familyrows,columns=["Child presentation","Ads","Children","Same-gender adult","Other-gender adult","Difference [CI]"]),
+    c.table(23,"adult-child-proximity",pd.DataFrame(familyrows,columns=["Child","Ads","Children","Same","Other","Difference [CI]"]),
         "Child proximity to feminine- and masculine-presenting adults.",
-        "Ads have exactly one feminine and one masculine adult and at least one infant/child; all ages must be adult or child categories. Distances use face centres after scaling each ad to a unit square; they measure layout, not physical distance or verified kinship. Child distances are averaged within ad and child gender. Negative differences indicate closer same-gender adults. "+CI_NOTE,
-        {"Same-gender adult":".3f","Other-gender adult":".3f"})
+        "Ads have exactly one feminine and one masculine adult and at least one infant/child; all ages must be adult or child categories. Same/other refer to the adult's gender relative to the child's. Distances use face centres after scaling each ad to a unit square; they measure layout, not physical distance or verified kinship. Child distances are averaged within ad and child gender. Negative differences indicate closer same-gender adults. "+CI_NOTE,
+        {"Same":".3f","Other":".3f"})
     fam.to_csv(c.work/"family-proximity-private.csv",index=False)
     # A focused robustness check for the exploratory area contrast.
     threshold_rows=[]
@@ -795,6 +811,8 @@ def finalize(c, integrate=False, update_manifest=False):
         for e in entries:
             if e["order"] in sectionmap:
                 blocks.extend(["", "```{=latex}", "\\clearpage", "```", "", "## "+sectionmap[e["order"]], ""])
+            elif e["order"] == 3:
+                blocks.extend(["```{=latex}", "\\clearpage", "```", ""])
             if e["kind"]=="table":
                 blocks.extend(["{{< include tables/generated/"+e["file"]+" >}}", ""])
             else:
