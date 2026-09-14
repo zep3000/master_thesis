@@ -24,6 +24,8 @@ study.
   validation results
 - `artifacts/brand-industry-verification/`: disclosure-safe aggregate audit
   results, error-transition inventories, and interpretation guidance
+- `artifacts/full-issue-face-audit/`: complete blind visual-label output and
+  the minimal detector-status join used for the Chapter 2 false-negative audit
 - `data/README.md`: source provenance, data availability, processing lineage,
   and expected local layout
 
@@ -39,6 +41,8 @@ images are not accidentally distributed.
   `artifacts/pipeline/README.md`.
 - The human-validation evidence and its limits are documented in
   `artifacts/human-validation/README.md`.
+- The blind face-audit labels and disclosure boundary are documented in
+  `artifacts/full-issue-face-audit/README.md`.
 
 Raw archive scans and row-level analysis tables are not public. Reviewed human
 annotation records are public after removal of direct assignee names,

@@ -1,0 +1,87 @@
+{
+  "schema_version": "full_issue_face_audit_publication_v1",
+  "annotation_method": {
+    "environment": "local Codex session",
+    "model": "GPT-5.5 Medium",
+    "visible_input": "extended face crop and opaque blind_id only",
+    "hidden_during_annotation": [
+      "human judgments",
+      "detector status",
+      "issue and page metadata",
+      "downstream classifications"
+    ]
+  },
+  "files": [
+    {
+      "path": "raw/direct-visual-annotations.jsonl",
+      "records": 1599,
+      "bytes": 188879,
+      "sha256": "c74662bd7bef23734c2e279359543111f8e61d3572c71941fbfc07333af310fd",
+      "fields": [
+        "blind_id",
+        "analyzability",
+        "gender",
+        "age",
+        "smile_presence"
+      ]
+    },
+    {
+      "path": "raw/blind-detection-status.csv",
+      "records": 1599,
+      "bytes": 39547,
+      "sha256": "ad078a8a618ca14cd56acf51a8b9793b1eeaed24ad7054137c7cfe5c0d0eb253",
+      "fields": [
+        "blind_id",
+        "detection_status"
+      ]
+    }
+  ],
+  "validation": {
+    "unique_blind_ids": 1599,
+    "one_to_one_join": true,
+    "detection_status": {
+      "found": 459,
+      "missed": 1140
+    },
+    "label_counts": {
+      "analyzability": {
+        "no expression can be inferred": 254,
+        "low": 343,
+        "medium": 519,
+        "high": 483
+      },
+      "gender": {
+        "male": 946,
+        "female": 403,
+        "ambiguous": 202,
+        "don't know": 48
+      },
+      "age": {
+        "non-adult": 61,
+        "young adult": 488,
+        "middle adult": 712,
+        "old adult": 150,
+        "don't know": 188
+      },
+      "smile_presence": {
+        "yes": 401,
+        "no": 581,
+        "don't know": 617
+      }
+    }
+  },
+  "source_provenance": {
+    "human_annotation_collection_sha256": "b1b79b85353ebf2f98239242ae2a9c8acf8993a87b41a850e3c0bb05ef630425",
+    "sample_manifest_sha256": "88729d2193148a0b6ece9ee509e7cce26acbae92bd5b42fab76c6583aa6cb78a",
+    "deduplicated_faces_dataset_sha256": "37f2f8b71f659092c380b29084f9c45ab3d5734bbc953b18c492634cd7abc1eb",
+    "matching_rule": "maximum-cardinality one-to-one matching within physical pages at IoU >= 0.17"
+  },
+  "excluded_from_publication": [
+    "source PDFs and images",
+    "extended face crops and contact sheets",
+    "bounding boxes and crop paths",
+    "machine paths and credentials",
+    "free-text notes",
+    "human analyzability labels"
+  ]
+}
