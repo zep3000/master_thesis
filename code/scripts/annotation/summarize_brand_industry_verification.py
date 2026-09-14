@@ -1,9 +1,7 @@
-"""Build disclosure-safe aggregate results for the brand/industry audit.
+"""Build aggregate results from the reviewed brand/industry annotation export.
 
-The source is a local human-verification export and must remain untracked.  This
-script deliberately emits no item, image, session, timestamp, note, or bounding-
-box fields.  Error inventories are grouped label transitions without source-row
-identifiers.
+The summaries contain no item, image, session, timestamp, note, or bounding-box
+fields. Error inventories are grouped label transitions without row IDs.
 """
 
 from __future__ import annotations

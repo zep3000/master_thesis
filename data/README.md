@@ -1,10 +1,10 @@
 # Data sources, provenance, and local layout
 
-Data files are deliberately excluded from this repository. The `.gitignore`
+Working data are deliberately excluded from this repository. The `.gitignore`
 rules retain this document while excluding everything else below `data/`.
-This prevents licensed archive images, authentication material, human
-annotations, and row-level research records from being published
-accidentally.
+This prevents licensed archive images, authentication material, and unreviewed
+row-level records from being published accidentally. Reviewed human-annotation
+exports are versioned separately under `artifacts/human-validation/raw/`.
 
 ## Face-detection dataset
 
@@ -94,35 +94,37 @@ excluded):
 
 Human annotation files were produced during this study with the included
 sampling notebooks and local annotation tooling; they are not third-party
-datasets and remain excluded. Model-result JSONL files were likewise generated
-locally from the licensed page images. Reviewed model-only pipeline artifacts
-may be distributed as GitHub release assets indexed by
+datasets. Pseudonymized row-level exports are published under
+`artifacts/human-validation/raw/`, with their processing and checksums recorded
+in its manifest. Model-result JSONL files were likewise generated locally from
+the licensed page images. Reviewed model-only pipeline artifacts are
+distributed as GitHub release assets indexed by
 `artifacts/pipeline/manifest.json`; they are not tracked as ordinary Git data.
 The release archives exclude source imagery, human/gold records, credentials,
 local logs, and machine-specific paths.
 
-The publication-safe aggregate results of the main 300-page, three-coder
-human--LLM evaluation are in `artifacts/human-validation/`. They report the
-entity counts, spatial detection results, people-area results, cohort
-attrition, human-majority availability, field agreement, chance-corrected
-agreement, and selected ordinal diagnostics used in Chapter 5. These tables
-support direct checking of the numerical claims without exposing row-level
-coder records or licensed source imagery. They do not permit independent
-recalculation from individual judgments.
+The main 300-page, three-coder human records and the corresponding aggregate
+human--LLM results are in `artifacts/human-validation/`. The row-level records
+permit independent recalculation when paired with the released model output;
+the aggregate tables report the entity counts, spatial detection results,
+people-area results, cohort attrition, agreement measures, and ordinal
+diagnostics used in Chapter 5. Licensed source imagery remains excluded.
 
 Disclosure-safe aggregate results from the separate brand-name and industry
 verification task are published under `artifacts/brand-industry-verification/`.
 They can be regenerated with
-`code/scripts/annotation/summarize_brand_industry_verification.py`. The raw
-export remains excluded because it contains row-level human judgments, source
-page identifiers, a persistent session code, exact timestamps, bounding boxes,
-and free-text fields.
+`code/scripts/annotation/summarize_brand_industry_verification.py`. Its reviewed
+row-level export is published under `artifacts/human-validation/raw/brand-industry/`
+after note fields and machine paths were removed.
 
-The evaluation preparation notebook expects its source JSONL files under:
+The evaluation preparation notebook reads the public coder JSONL files from:
 
 ```text
-data/annotations/llm_evaluation_300/
+artifacts/human-validation/raw/three-coder/
 ```
+
+Set `PIPELINE_ARTIFACT_ROOT` to the extracted `qwen_iteration` directory from
+the final pipeline release so the notebook can load the matching LLM output.
 
 Application autosaves belong under:
 

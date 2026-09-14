@@ -5,8 +5,11 @@ artifacts. Keep the tracked tree suitable for public access.
 
 ## Privacy and repository boundaries
 
-- Never commit raw datasets, human annotations, source PDFs or images,
-  credentials, API keys, local logs, or row-level derived data.
+- Never commit licensed source datasets, source PDFs or images, credentials,
+  API keys, local logs, or unreviewed row-level data. Human annotations may be
+  published only as the reviewed export under `artifacts/human-validation/raw/`:
+  direct assignee names, assignment/session codes, comments, notes, and machine
+  paths must be removed by the tracked publication script before committing.
 - Reviewed model-only pipeline artifacts may be published as GitHub release
   assets when they are listed with sizes and SHA-256 hashes in
   `artifacts/pipeline/manifest.json`. Keep the large files themselves out of Git.
@@ -64,6 +67,9 @@ artifacts. Keep the tracked tree suitable for public access.
 - Recompute every manifest size and SHA-256 value.
 - Search tracked files for credentials, absolute local paths, and excluded
   material.
+- Verify the human-annotation publication manifest, expected record counts,
+  coder pseudonyms, and removal of direct names, assignment/session codes,
+  comments, notes, and machine paths.
 - Run each tracked Node application's test suite and parse all bundled JSON and
   YAML fixtures before committing.
 - Keep changes scoped and preserve existing user edits.

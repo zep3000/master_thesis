@@ -2,8 +2,9 @@
 
 This repository is the public research record for a computational analysis of
 facial expressions in historical advertising. It contains the analysis and
-pipeline source, publication-safe aggregate evidence, selected generated
-figures, and the local annotation interfaces used in the study.
+pipeline source, reviewed human-annotation records and aggregate evidence,
+selected generated figures, and the local annotation interfaces used in the
+study.
 
 ## Contents
 
@@ -18,8 +19,8 @@ figures, and the local annotation interfaces used in the study.
   iterations used to reach it
 - `artifacts/pipeline/`: checksummed GitHub release assets containing the full
   reviewed model-only run artifacts
-- `artifacts/human-validation/`: disclosure-safe aggregate results from the
-  300-page, three-coder human--LLM validation
+- `artifacts/human-validation/`: pseudonymized row-level human annotations,
+  full-issue face boxes, and aggregate validation results
 - `artifacts/brand-industry-verification/`: disclosure-safe aggregate audit
   results, error-transition inventories, and interpretation guidance
 - `data/README.md`: source provenance, data availability, processing lineage,
@@ -38,11 +39,12 @@ images are not accidentally distributed.
 - The human-validation evidence and its limits are documented in
   `artifacts/human-validation/README.md`.
 
-Raw archive scans, human annotation records, and row-level analysis tables are
-not public. Their exclusion reflects archive licensing and disclosure rules,
-not an absence of validation evidence: the public aggregate tables report the
-sample sizes, denominators, matching rules, agreement measures, and main error
-diagnostics used in the thesis.
+Raw archive scans and row-level analysis tables are not public. Reviewed human
+annotation records are public after removal of direct assignee names,
+assignment/session codes, comments, notes, and machine paths. Source-page
+identifiers, pseudonymous session IDs, timestamps, and annotation geometry
+remain to support transparent checking and reuse; source images remain
+excluded under the archive access terms.
 
 ## Python environment
 

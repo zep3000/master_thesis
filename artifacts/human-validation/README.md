@@ -1,17 +1,21 @@
-# Aggregate human--LLM validation results
+# Human annotations and human--LLM validation results
 
-This directory publishes the disclosure-safe numerical evidence used for the
-main validation in Chapter 5. Three human coders and the final LLM pipeline
-annotated the same 300 sampled archive pages. The tables below are copied from
-the final thesis table fragments and retain their original denominators and
-notes.
+This directory publishes the reviewed human-annotation record and numerical
+evidence used for the main validation in Chapter 5. Three human coders and the
+final LLM pipeline annotated the same 300 sampled archive pages. The tables
+below retain their final denominators and notes.
 
-The public record supports checking the reported counts, matching decisions,
-agreement rates, chance-corrected measures, and principal error diagnostics.
-It does not include row-level human judgments, page identifiers, timestamps,
-bounding boxes, or source images, and therefore does not support independent
-recalculation from individual records. Visual error atlases are also excluded
-because they reproduce licensed magazine imagery.
+The pseudonymized row-level exports are under `raw/`, with file-level checksums
+and transformation counts in `raw/manifest.json`. They include the 900 records
+from the three-coder validation, 201 brand/industry review records, and 1,599
+face-box rows from the full-issue scans. Source images and visual error atlases
+remain excluded because they reproduce licensed magazine imagery.
+
+Direct assignee names are replaced by A, B, and C. Assignment/session codes,
+comments, notes, and absolute machine paths are removed. Annotation-set IDs,
+pseudonymous session IDs, timestamps, page identifiers, geometry, workflow
+telemetry, and substantive judgments remain. The result is pseudonymized, not
+anonymous: an external mapping could reconnect a session ID to a coder.
 
 ## Scope and definitions
 

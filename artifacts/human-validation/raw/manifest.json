@@ -1,0 +1,319 @@
+{
+  "schema_version": "human_annotation_publication_v1",
+  "sanitization": {
+    "assignee_name": "replaced with A, B, or C in the three-coder exports",
+    "assignment_and_session_codes": "removed",
+    "comments_and_notes": "removed",
+    "absolute_paths": "replaced with portable source-images/ or manifests/ paths",
+    "other_fields": "retained"
+  },
+  "datasets": [
+    {
+      "name": "three-coder validation",
+      "records": 900,
+      "files": [
+        {
+          "path": "three-coder/coder-a.jsonl",
+          "records": 300,
+          "bytes": 3186343,
+          "sha256": "c1d056b4e844b0db3d1e4ef14b97296e0c8853653a15ad14698c50db30f51eed",
+          "transformations": {
+            "assignment_code_removed": 600,
+            "assignee_name_replaced": 300,
+            "comment_fields_removed": 300
+          }
+        },
+        {
+          "path": "three-coder/coder-b.jsonl",
+          "records": 300,
+          "bytes": 4020608,
+          "sha256": "cefd80f3ea366e8c7568b80ef90b8e0bf34c2ecfc607ce9a3e662b5615fdc1e1",
+          "transformations": {
+            "assignment_code_removed": 600,
+            "assignee_name_replaced": 300,
+            "comment_fields_removed": 300
+          }
+        },
+        {
+          "path": "three-coder/coder-c.jsonl",
+          "records": 300,
+          "bytes": 3548919,
+          "sha256": "9004c922cfcb66999622a78097bb306adc96211fd63de86f50b788a4782a4849",
+          "transformations": {
+            "assignment_code_removed": 600,
+            "assignee_name_replaced": 300,
+            "comment_fields_removed": 300
+          }
+        }
+      ]
+    },
+    {
+      "name": "brand and industry verification",
+      "records": 201,
+      "files": [
+        {
+          "path": "brand-industry/annotations.jsonl",
+          "records": 201,
+          "bytes": 191403,
+          "sha256": "23977bb2ef05059534f2f9b0c4ce37a1b22cc36ba0a5293cd92eeeea693eafa0",
+          "transformations": {
+            "comment_fields_removed": 402
+          }
+        }
+      ]
+    },
+    {
+      "name": "full-issue face boxes",
+      "file_count": 35,
+      "records": 1599,
+      "unique_page_identifiers": 557,
+      "files": [
+        {
+          "path": "full-issue-scans/ECON-1944-0219_annotations.csv",
+          "records": 4,
+          "bytes": 285,
+          "sha256": "2579818af379cef20bc5e03586630f16b5404f4f0b401aa534f33e8352e2d947",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-1945-0120_annotations.csv",
+          "records": 6,
+          "bytes": 399,
+          "sha256": "7af727341fb1785fa598d6abda3e2f97fd3939d381fe7c2c3fc00130f57b97bb",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-1945-0526_annotations.csv",
+          "records": 4,
+          "bytes": 282,
+          "sha256": "dcf4ac2591d57b29e7ae38bc02ae54636faa97f2ae8a06447044585dd918fb48",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-1946-0119_annotations.csv",
+          "records": 6,
+          "bytes": 392,
+          "sha256": "e05155f534e88d1f1403e3b74efd025ddcc0bc3a466481a663c8f80087841752",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-1946-0126_annotations.csv",
+          "records": 2,
+          "bytes": 174,
+          "sha256": "39699bd608e09b940719f4ce30c318925f85ad52486c8b0a5b42b548e49cc5c3",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-1950-0114_annotations.csv",
+          "records": 5,
+          "bytes": 343,
+          "sha256": "4d29d1079d31aae8591dcefba89f29afabd3e981723d8fecf3e33cdc7e13f0b6",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-1950-0304_annotations.csv",
+          "records": 10,
+          "bytes": 623,
+          "sha256": "6cae308b78ca2f95026b47b83c1bea761aaac5f1de135bb9e83678412f896216",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-1952-0315_annotations.csv",
+          "records": 16,
+          "bytes": 959,
+          "sha256": "5f8d849b26055b0929529c2a885b9459335de9a0c9e4f182176f495069782745",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-1956-0526_annotations.csv",
+          "records": 13,
+          "bytes": 795,
+          "sha256": "62e2de960f1ff21be42d582e03ba5288fa16c221238f8fbdda7bc52a12d5768f",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-1957-0504_annotations.csv",
+          "records": 50,
+          "bytes": 2848,
+          "sha256": "73fd4ac2d546db557ecc406f0f14fa02ce562d6acfc61e8f0d9ec71e27a35e23",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-1962-0908_annotations.csv",
+          "records": 39,
+          "bytes": 2229,
+          "sha256": "fefc3d31fc9656e8a6773a3e7c27f591642620528939a234c61ced664980fb2a",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-1962-0915_annotations.csv",
+          "records": 43,
+          "bytes": 2485,
+          "sha256": "372697169416fc8338f63811adbe65afa77502d0165db0d4d3eea6eb3c943d2a",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-1962-1215_annotations.csv",
+          "records": 44,
+          "bytes": 2526,
+          "sha256": "a4e2a00ece993fe442172093e0a8e6253e8a236d61799fd04b9eb95052a8a089",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-1964-1212_annotations.csv",
+          "records": 30,
+          "bytes": 1728,
+          "sha256": "f662597dd1767b56b9378f4ef75add5b0970b876ce03aaedc408a992cf416677",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-1969-0517_annotations.csv",
+          "records": 31,
+          "bytes": 1791,
+          "sha256": "7f8fc0ae990f3d50fcb7ec80846fcefc66fc1496eb85cf5f901f180e02cb0180",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-1974-0928_annotations.csv",
+          "records": 49,
+          "bytes": 2804,
+          "sha256": "f83fd13324be86acebcf3613f78be0d2cd5fada04607ce52ff795ca833d52987",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-1976-1009_annotations.csv",
+          "records": 141,
+          "bytes": 7951,
+          "sha256": "b39e4f33bbaecd73484269dcdf6fa99152ed5d09f69773731bf9b5267f98e27f",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-1977-0723_annotations.csv",
+          "records": 31,
+          "bytes": 1800,
+          "sha256": "a1b279c0f8c0b0f5542969dd1b2d558467f492c8d1e99bc7de8206c81fea61fb",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-1977-0917_annotations.csv",
+          "records": 75,
+          "bytes": 4262,
+          "sha256": "4015d3bbd41771a728753ae1995125b69c02238826ca4c9ae6c7df4fb4f0d378",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-1979-1208_annotations.csv",
+          "records": 42,
+          "bytes": 2410,
+          "sha256": "58aa0976c98f87fbf65cfbefd2c9135df1c9f344545842b15c2b908968cba29a",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-1981-0314_annotations.csv",
+          "records": 61,
+          "bytes": 3457,
+          "sha256": "47cf777d7127b7aced22f4b22d576e9a6ff9844422ce2c29e361b5120f21de48",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-1982-0703_annotations.csv",
+          "records": 77,
+          "bytes": 4387,
+          "sha256": "99695d91987c2bb771cabde3adc4bd3a56e40c4d2df5328a940254e7f06ba6d3",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-1984-0714_annotations.csv",
+          "records": 48,
+          "bytes": 2743,
+          "sha256": "62005ecde1bed75227cafcc3073e7d082e50355756a85786f96a79c9abce5847",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-1985-0914_annotations.csv",
+          "records": 33,
+          "bytes": 1915,
+          "sha256": "77af7986677bdd99ddbd288af6383a6af065d905014fdae6164f8456c9e91243",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-1985-1130_annotations.csv",
+          "records": 158,
+          "bytes": 8904,
+          "sha256": "7dc90eb692b0e46e7d32d2fb42d5417d0d02e2c25266681e0a20d78c4da2f3df",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-1990-1110_annotations.csv",
+          "records": 54,
+          "bytes": 3088,
+          "sha256": "74c57928a1c22146b8752083f66cc9032bdde5392e8271d044acad001fe3aa4d",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-1991-0928_annotations.csv",
+          "records": 63,
+          "bytes": 3539,
+          "sha256": "276242a8c8ec9e2ef01982865529f98c382796ef331e8c7176eb25ee6abee9d0",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-1995-0415_annotations.csv",
+          "records": 51,
+          "bytes": 2884,
+          "sha256": "37f3afd011094c5be66f222bb7a4716d5e52d40f365e2651796270b29f8b227b",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-1995-1021_annotations.csv",
+          "records": 86,
+          "bytes": 4871,
+          "sha256": "1df456b78fa20a6cb1d7f9df98683691e4511a67237b1f2290bf3a57cd6c485f",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-1996-0824_annotations.csv",
+          "records": 38,
+          "bytes": 2148,
+          "sha256": "067f787e50731b88e381880fbc3276c0042084c102e9d1f409e985d951e7b144",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-2002-1012_annotations.csv",
+          "records": 60,
+          "bytes": 3403,
+          "sha256": "7ced388df50568239d85e908e61ff874934daa5cba5593e21ae445b782e178a0",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-2003-0301_annotations.csv",
+          "records": 63,
+          "bytes": 3549,
+          "sha256": "5bd03e22119837a4b496b7707699720574a7fb9e1588893fb41d29ca89dfcbe8",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-2003-0419_annotations.csv",
+          "records": 40,
+          "bytes": 2271,
+          "sha256": "8b0e264ad681161581ea51c2d386dd9d4493db46d6b0c2eca3c778d84c50663a",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-2003-0920_annotations.csv",
+          "records": 76,
+          "bytes": 4279,
+          "sha256": "28b1245d5d43f5ec71645f4bc91e7bcf22714d27005c23931d10a03c40f931af",
+          "transformations": {}
+        },
+        {
+          "path": "full-issue-scans/ECON-2004-0612_annotations.csv",
+          "records": 50,
+          "bytes": 2862,
+          "sha256": "f3d3f93d4038166192686e56a704c57c38d258d24c6c24d0749596d2737ba1e0",
+          "transformations": {}
+        }
+      ]
+    }
+  ]
+}

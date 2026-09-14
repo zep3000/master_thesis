@@ -65,13 +65,12 @@ The files contain no source-record identifiers.
 
 ## Privacy and disclosure
 
-The local export is **pseudonymized, not anonymous**. It has no human name or
-email address, but it includes a persistent session code, exact timestamps,
-source-page identifiers, advertisement and face boxes, and free-text fields.
-The thesis also identifies the verifier as the author. In keeping with this
-repository's publication rules, raw human annotations and row-level derived
-records remain excluded. The published CSVs contain only aggregate metrics and
-grouped label transitions; they omit item, image, page, session, time, note, and
+The reviewed row-level export is published at
+`../human-validation/raw/brand-industry/annotations.jsonl`. Note fields and
+machine paths are removed; the pseudonymous session ID, exact timestamps,
+source-page identifiers, advertisement and face boxes, and substantive field
+judgments remain. It is pseudonymized, not anonymous. The aggregate CSVs in
+this directory continue to omit item, image, page, session, time, note, and
 bounding-box fields.
 
 ## Reproduce locally
@@ -81,7 +80,7 @@ repository root:
 
 ```powershell
 python code/scripts/annotation/summarize_brand_industry_verification.py `
-  path/to/local/annotations `
+  artifacts/human-validation/raw/brand-industry/annotations.jsonl `
   --output-dir artifacts/brand-industry-verification `
   --qmd-output path/to/private/thesis/tables/generated/brand-industry-verification.qmd
 ```
