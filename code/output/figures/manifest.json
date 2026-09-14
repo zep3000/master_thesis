@@ -3,9 +3,9 @@
   "description": "Versioned figure artifacts for verified downstream use.",
   "files": [
     {
-      "name": "ch06-adjusted-trends.svg",
-      "sha256": "641abd00d4b25d65846c3cdaf306428afdd838f56dde14cffeb83d1a78af2c9b",
-      "bytes": 31226
+      "name": "ad-iou-threshold-f1-curves.svg",
+      "sha256": "e6c83ef1bd1851040f37839ff1242eb42554cc113b243fb4cc50444bfa38fd51",
+      "bytes": 56414
     },
     {
       "name": "ch06-age-composition.svg",
@@ -19,8 +19,8 @@
     },
     {
       "name": "ch06-depiction-trends.svg",
-      "sha256": "74fa1a689ad5c2d23ccfac14e3af5c99d9c23623fd9731ebf92bed070539be70",
-      "bytes": 22869
+      "sha256": "b9601f05b0a0447e115fd43d646e13ddeae2fa791601df6a3c8c3d78a8c6ee9b",
+      "bytes": 24129
     },
     {
       "name": "ch06-dyad-trends.svg",
@@ -28,14 +28,9 @@
       "bytes": 23843
     },
     {
-      "name": "ch06-face-size.svg",
-      "sha256": "789469b10b50de7904502f40343bbc41d62c0eb1bf6272a9dc7d1ee8ec9cc5e0",
-      "bytes": 31276
-    },
-    {
       "name": "ch06-gender-intensity.svg",
-      "sha256": "d700cc3c12bf19cbdd8907f73adbdda3dfad52d6caa9611cdcb41b42f5d5a8ba",
-      "bytes": 35557
+      "sha256": "e88ef5ab7f76e31a8ce5c5c3251ed737514c78d256092074a07ab45cf3a83bd9",
+      "bytes": 32446
     },
     {
       "name": "ch06-gender-representation.svg",
@@ -44,28 +39,28 @@
     },
     {
       "name": "ch06-gender-smile-trends.svg",
-      "sha256": "46b5b6aa2638384a76bd0834ecb488ff93a2365a0d0f2db136c2714404a9f8df",
-      "bytes": 25039
+      "sha256": "f5dcc25ba5044c0ad652118653d38fdb0ae50c6dbbe29c739e0d8cd819372ad0",
+      "bytes": 26292
     },
     {
       "name": "ch06-historical-smiling.svg",
-      "sha256": "d218631d55dbd96f0bd0702e2ff7318b8eb3102e1a39c931e755fe62f1918c09",
-      "bytes": 35495
-    },
-    {
-      "name": "ch06-industry-standardised.svg",
-      "sha256": "23381e1d605f0f4cf2d1a49fbdbddd1425219b15b2fc84c6890a2cfd2927dd86",
-      "bytes": 26718
+      "sha256": "f01f829791a0daf0afa9b4e89ca4c7f38acf4fe5345ae09980429c3df7de9c4a",
+      "bytes": 39006
     },
     {
       "name": "ch06-industry-trends.svg",
-      "sha256": "4a3678bdd0a4926be682dee37289da829a40d631ddd2608552f7096ae35ff414",
-      "bytes": 53294
+      "sha256": "b9f94993a4f0e9c20a41168d629a3ec33e3486ade0ec7dcc2fc942dd21e0e192",
+      "bytes": 60901
     },
     {
       "name": "ch06-legibility.svg",
       "sha256": "5c83d91db16a0414b41aaa138ed84ecea59dcfeb7f333885bf97ae084669b92e",
       "bytes": 32180
+    },
+    {
+      "name": "ch06-multi-face-smile-concentration.svg",
+      "sha256": "3ad2e01e02a89a9b235b8adf6980cc6cef20d2f5774148cfa2958d839dbe502a",
+      "bytes": 28601
     },
     {
       "name": "ch06-prominence-smile.svg",
@@ -96,6 +91,26 @@
       "name": "faces_per_issue_decade_summary.svg",
       "sha256": "21cc139b4c24d2a4b0740c5599343955dab89ebeff23e4c1523d341d3692957d",
       "bytes": 1422156
+    },
+    {
+      "name": "individual-agreement-by-decade.svg",
+      "sha256": "df62475e51b3c947b4d24a2c99988b642b2ec29e15d6b91fa11a33f1d4cd7559",
+      "bytes": 90231
+    },
+    {
+      "name": "individual-ordinal-context-by-decade.svg",
+      "sha256": "b40753336ff63165cc841dce0b3c7ec51f78dffce9772b4a8cb2fac0831276de",
+      "bytes": 131326
+    },
+    {
+      "name": "iou-threshold-f1-curves.svg",
+      "sha256": "5a66ef84755dca84c86eccc783ea39469ecbfb8b530a23d7339b8002b9ea0634",
+      "bytes": 76833
+    },
+    {
+      "name": "iou-threshold-pairwise-f1-curves.svg",
+      "sha256": "60a6c6a6193d82159d279605fd8e1ce4ba80c6ab3f80da65612b55663c0d2096",
+      "bytes": 128160
     },
     {
       "name": "issues_with_detected_faces.svg",

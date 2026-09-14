@@ -36,7 +36,7 @@ SHORT_INDUSTRY = {
     "Leisure & entertainment": "Leisure & entertainment",
 }
 CI_NOTE = "95% CIs use 2,000 bootstrap resamples of whole issues, stratified by publication year."
-CHAPTER_ORDERS = [1, 2, 7, 10, 5, 8, 9, 11, 12, 6, 13, 14, 15, 17, 19, 21, 27, 24, 25, 26]
+CHAPTER_ORDERS = [2, 7, 10, 5, 9, 11, 12, 6, 13, 14, 28, 29, 30, 16, 17, 21]
 
 
 def decade_label(d):
@@ -180,11 +180,8 @@ class Analysis:
         counts["context"] = np.select([counts.n.eq(1), counts.f.eq(counts.n), counts.m.eq(counts.n), counts.f.gt(0) & counts.m.gt(0) & (counts.f+counts.m).eq(counts.n)],
             ["Solo", "Feminine only", "Masculine only", "Mixed"], default="Uncertain mix")
         p = p.merge(counts, left_on="ad", right_index=True, validate="many_to_one")
-        p["model_context"] = p.context.replace({"Feminine only": "Same-gender multiple", "Masculine only": "Same-gender multiple"})
         p["period"] = period(p.year)
         p["feminine"] = p.gender.eq("feminine").astype(int)
-        p["t"] = (p.year - 1970)/10
-        p["log_area"] = np.log(p.area)
         p["assessable"] = p.smile.notna().astype(float)
         self.people = p
         self.binary = p.loc[p.gender.isin(GENDERS) & p.smile.notna()].copy()
@@ -194,6 +191,12 @@ class Analysis:
         # A known smile establishes presence even if another face is unassessable;
         # a known absence requires every recorded face to have smile=no.
         self.ads["any_smile"] = np.where(self.ads.smile_yes.gt(0), 1., np.where(self.ads.smile_n.eq(self.ads.n_faces), 0., np.nan))
+        # Conversely, every recorded face must be assessed as smiling to establish
+        # an all-smiling ad; one assessed non-smile is enough to establish absence.
+        self.ads["all_smile"] = np.where(
+            self.ads.smile_yes.lt(self.ads.smile_n), 0.,
+            np.where(self.ads.smile_n.eq(self.ads.n_faces) & self.ads.smile_yes.eq(self.ads.n_faces), 1., np.nan),
+        )
         self.ads["period"] = period(self.ads.year)
         self.results["input"] = {"file": self.input.name, "sha256": hashlib.sha256(self.input.read_bytes()).hexdigest(),
             "pages": len(self.pages), "issues": self.pages.issue.nunique(), "ads": len(self.ads), "faces": len(p),
@@ -219,17 +222,19 @@ class Analysis:
         name = "ch06-" + name
         _, qmd = export_quarto_table(df, name, caption=caption, label="tbl-"+name,
             note=note, formats=formats or {}, data_dir=self.work, qmd_dir=self.tabledir,
-            alignments={c: "right" for c in df.columns[1:]})
+            alignments={c: "left" if order == 28 else "right" for c in df.columns[1:]})
         # Give intervals and long labels room in the native thesis tables.
         # Equal-width columns otherwise split short intervals across three lines.
         widths = {
+            2: [12, 10, 12, 25, 17, 24],
             8: [12, 8, 24, 8, 24, 24],
             13: [29, 9, 11, 11, 11, 29],
-            21: [12, 8, 10, 10, 10, 10, 12, 28],
-            23: [18, 8, 10, 13, 13, 38],
+            21: [14, 16, 21, 21, 28],
             24: [12, 10, 28, 11, 11, 28],
             26: [29, 9, 10, 10, 21, 21],
-            27: [24, 10, 28, 10, 28],
+            28: [29, 44, 27],
+            29: [37, 17, 12, 34],
+            30: [28, 9, 10, 9, 10, 34],
         }
         if order in widths:
             columns = ",".join(map(str, widths[order]))
@@ -290,42 +295,45 @@ def line_ci(ax, x, rows, color, label, percent=True):
 
 def foundation(c):
     p, a = c.people, c.ads
-    baseline = [("Processed page/spread records", len(c.pages)), ("Publication issues", c.pages.issue.nunique()),
-        ("Retained advertisements", len(a)), ("Individual face depictions", len(p))]
-    c.table(1, "corpus", pd.DataFrame(baseline, columns=["Unit / subset", "N"]),
-        "Corpus and analysis units, 1940-2007.",
-        "Entire advertisements containing people areas are excluded. Counts describe recorded depictions, including repeated appearances, rather than unique people or ad designs.", {"N": ",.0f"})
     logpath = c.input.parent / "llm-annotations-people-area-ad-cleaning-log.csv"
     logs = pd.read_csv(logpath)
     logs["decade"] = logs.image_id.str[:4].astype(int)//10*10
     coverage=[]
     for d in DECADES:
         q=p.loc[p.decade.eq(d)]; pg=c.pages.loc[c.pages.decade.eq(d)]; ad=a.loc[a.decade.eq(d)]; lg=logs.loc[logs.decade.eq(d)]
-        coverage.append([decade_label(d), pg.issue.nunique(), len(pg), len(ad), len(q), lg.action.eq("removed").mean()])
-    c.table(2, "coverage", pd.DataFrame(coverage, columns=["Decade", "Issues", "Images", "Ads", "Faces", "Ads removed"]),
-        "Corpus coverage and people-area exclusions by decade.", "Images are page/spread records. Ads removed is the share of source ads removed because they contained people areas.", {"Ads removed": ".1%"})
+        removed=int(lg.action.eq("removed").sum())
+        coverage.append([decade_label(d), pg.issue.nunique(), len(pg), f"{removed:,} ({removed/len(lg):.1%})", len(ad), len(q)])
+    removed=int(logs.action.eq("removed").sum())
+    coverage.append(["Total", c.pages.issue.nunique(), len(c.pages), f"{removed:,} ({removed/len(logs):.1%})", len(a), len(p)])
+    c.table(2, "coverage", pd.DataFrame(coverage, columns=["Decade", "Issues", "Images", "People-area ads excluded, n (%)", "Retained ads", "Retained individual faces"]),
+        "Analysis corpus totals, decade coverage, and people-area-ad exclusions, 1940-2007.",
+        "Images are page/spread records. Exclusion percentages use all source ads within each row as their denominator (27,756 overall).",
+        {k: ",.0f" for k in ["Issues", "Images", "Retained ads", "Retained individual faces"]})
     intensity_names={1:"Slight",2:"Clear",3:"Broad",4:"Laughter-like"}
     annual=p.groupby("year").agg(yes=("smile","sum"),n=("smile","count"),intensity=("intensity","mean"))
-    annual=annual.reindex(range(1940,2008));smooth=annual.yes.rolling(5,center=True,min_periods=1).sum()/annual.n.rolling(5,center=True,min_periods=1).sum()
+    annual=annual.reindex(range(1940,2008));smooth=annual.yes.rolling(5,center=True,min_periods=5).sum()/annual.n.rolling(5,center=True,min_periods=5).sum()
     fig,axs=plt.subplots(1,2,figsize=(9,3.5),layout="constrained")
-    axs[0].scatter(annual.index,annual.yes/annual.n,s=11,alpha=.45,color="#66717E",label="Annual")
+    annual_plotted=annual.n.ge(10)
+    axs[0].scatter(annual.index[annual_plotted],(annual.yes/annual.n)[annual_plotted],s=11,alpha=.45,color="#66717E",label="Annual (n≥10)")
     axs[0].plot(annual.index,smooth,color=COLORS["all"],lw=2,label="Five-year pooled")
     pct_axis(axs[0]);axs[0].set_title("Faces smiling");axs[0].legend(fontsize=8)
     adcurves={}
-    for col,label,color in [("any_smile","Ads containing a smile","#F58518"),("mean_smile","Mean within-ad smile share","#4C78A8")]:
+    for col,label,color in [("any_smile","Ads containing a smile","#F58518"),
+                            ("mean_smile","Mean within-ad smile share","#4C78A8"),
+                            ("all_smile","All faces smiling","#54A24B")]:
         vals=[c.boot.mean(a.loc[a.decade.eq(d)],col) for d in DECADES];adcurves[col]=[{k:v for k,v in z.items() if k!="samples"} for z in vals]
         line_ci(axs[1],DECADES,vals,color,label)
     decade_axis(axs[1]);axs[1].set_title("Advertisement summaries");axs[1].legend(fontsize=7.5,loc="lower right")
     annual["share"]=annual.yes/annual.n
-    annual["window_yes"]=annual.yes.rolling(5,center=True,min_periods=1).sum()
-    annual["window_n"]=annual.n.rolling(5,center=True,min_periods=1).sum()
+    annual["window_yes"]=annual.yes.rolling(5,center=True,min_periods=5).sum()
+    annual["window_n"]=annual.n.rolling(5,center=True,min_periods=5).sum()
     annual["five_year_share"]=smooth
     c.numeric("historical-smiling","annual",annual.drop(columns="intensity").reset_index())
     c.numeric("historical-smiling","ads",pd.DataFrame([dict(series=col,decade=d,**v)
         for col,vals in adcurves.items() for d,v in zip(DECADES,vals)]))
     c.figure(5,"historical-smiling",fig,"Historical development of smile presence.",
         f"Smile shares use yes/(yes + no): {int(p.smile.sum()):,} of {int(p.smile.count()):,} assessable faces overall; {int(p.smile.isna().sum()):,} are unassessable. "
-        "Five-year curves pool smile counts; edge windows use available years. An ad is known positive if any face smiles and known negative only if every face is assessed as non-smiling. Mean within-ad shares use ads with at least one assessable face. "+CI_NOTE)
+        "The five-year curve pools smile counts and is shown only for complete centred windows; annual points require at least 10 assessable faces. An ad is known positive if any face smiles and known negative only if every face is assessed as non-smiling. Mean within-ad shares use ads with at least one assessable face. An all-smiling ad requires every recorded face to be assessable and smiling; one assessed non-smile establishes a negative, while remaining indeterminate ads are excluded. 95% CIs calculated as described above.")
     fig,axs=plt.subplots(1,2,figsize=(9,3.5),layout="constrained")
     medium=pd.crosstab(p.decade,p.medium,normalize="index").reindex(DECADES)
     axs[0].plot(DECADES,medium["Photograph"],"o-",color="#4C78A8");pct_axis(axs[0]);decade_axis(axs[0]);axs[0].set_title("Photographic depictions")
@@ -334,7 +342,7 @@ def foundation(c):
         vals=[c.boot.mean(p.loc[p.decade.eq(d)&p.medium.eq(m)]) for d in DECADES]
         medium_detail.extend(dict(medium=m,decade=d,**{k:v for k,v in val.items() if k!="samples"}) for d,val in zip(DECADES,vals))
         line_ci(axs[1],DECADES,vals,col,m)
-    decade_axis(axs[1]);axs[1].legend(fontsize=9);axs[1].set_title("Smiling within depiction type")
+    decade_axis(axs[1]);axs[1].grid(axis="y");axs[1].legend(fontsize=9);axs[1].set_title("Smiling within depiction type")
     medium_counts=p.groupby(["decade","medium"]).size().rename("n").reset_index()
     medium_counts["denominator"]=medium_counts.groupby("decade").n.transform("sum")
     medium_counts["share"]=medium_counts.n/medium_counts.denominator
@@ -376,9 +384,9 @@ def gender_age(c):
     fig,axs=plt.subplots(1,2,figsize=(9,3.6),layout="constrained")
     for gender in GENDERS:
         line_ci(axs[0],DECADES,[g[gender] for g in gaps],COLORS[gender],gender.capitalize())
-    axs[0].legend();axs[0].set_title("Smile shares");decade_axis(axs[0])
+    axs[0].legend();axs[0].set_title("Smile shares");axs[0].grid(axis="y");decade_axis(axs[0])
     line_ci(axs[1],DECADES,gaps,"#263238","Feminine - masculine",False)
-    axs[1].yaxis.set_major_formatter(PercentFormatter(1,symbol=""));axs[1].set_ylabel("Difference (percentage points)");axs[1].axhline(0,color="#AAB3BC",lw=.8);axs[1].grid(axis="y");decade_axis(axs[1]);axs[1].set_title("Gender smile gap")
+    axs[1].set_ylim(bottom=0);axs[1].yaxis.set_major_formatter(PercentFormatter(1,symbol=""));axs[1].set_ylabel("Difference (percentage points)");axs[1].axhline(0,color="#AAB3BC",lw=.8);axs[1].grid(axis="y");decade_axis(axs[1]);axs[1].set_title("Gender smile gap")
     c.figure(9,"gender-smile-trends",fig,"Smile shares and the feminine-minus-masculine gap over time.",CI_NOTE)
     fig,axs=plt.subplots(1,2,figsize=(10,4),layout="constrained")
     agedist=[]
@@ -425,7 +433,7 @@ def gender_age(c):
     c.numeric("age-smile","pooled",pd.DataFrame(age_rows))
     c.numeric("age-smile","decades",pd.DataFrame(age_decades))
     c.figure(11,"age-smile",fig,"Age-specific smiling and gender gaps.","Grey cells have fewer than 30 assessable faces in either gender. The left panel pools all years and omits groups with fewer than 30 faces or 10 issues. "+CI_NOTE)
-    fig,axs=plt.subplots(1,3,figsize=(11,3.7),layout="constrained")
+    fig,axs=plt.subplots(1,3,figsize=(11,4.0),layout="constrained")
     intensity_values=[]
     for ax,gender in zip(axs,["All"]+GENDERS):
         q=p.loc[p.smile.eq(1)] if gender=="All" else p.loc[p.gender.eq(gender)&p.smile.eq(1)]
@@ -435,7 +443,9 @@ def gender_age(c):
             for level in [1,2,3,4]:
                 intensity_values.append(dict(gender=gender,decade=dec,intensity=level,n=int(z.intensity.eq(level).sum()),denominator=len(z),share=cross.loc[dec,level]))
         ax.stackplot(DECADES,*[cross[i] for i in [1,2,3,4]],colors=INT_COLORS,labels=["Slight","Clear","Broad","Laughter-like"])
-        pct_axis(ax);decade_axis(ax);ax.set_title(gender.capitalize());ax.legend(fontsize=8,loc="lower right")
+        pct_axis(ax);decade_axis(ax);ax.set_title(gender.capitalize())
+    handles,labels=axs[0].get_legend_handles_labels()
+    fig.legend(handles,labels,fontsize=8.5,loc="upper center",bbox_to_anchor=(.5,-.02),ncol=4,frameon=False,columnspacing=1.6)
     c.numeric("gender-intensity","shares",pd.DataFrame(intensity_values))
     c.figure(12,"gender-intensity",fig,"Smile intensity overall and by gender among smiling depictions.","Each decade sums to 100% among the corresponding smiling faces. Intensity is an ordered verbal category, not a calibrated physical scale; Chapter 5's category-specific measurement tendencies apply.")
     overall=c.boot.gap(b)
@@ -464,6 +474,7 @@ def industry_context(c):
         "F share uses faces with feminine/masculine presentation; smile shares use assessable faces within gender. Rows are ordered by ad count. "+CI_NOTE,
         {"F share":".1%","F smile":".1%","M smile":".1%"})
     pd.DataFrame(detail).to_csv(c.work/"industry-detail.csv",index=False)
+
     top=industry_order[:6]
     industry_values=[]
     fig,axs=plt.subplots(2,3,figsize=(10.2,6),layout="constrained",sharex=True,sharey=True)
@@ -475,54 +486,12 @@ def industry_context(c):
             # Do not draw unstable or unsupported series points.
             vals=[v if v["n"]>=30 else {**v,"estimate":np.nan,"low":np.nan,"high":np.nan} for v in vals]
             line_ci(ax,DECADES,vals,COLORS[gender],gender.capitalize())
-        decade_axis(ax);ax.set_title(SHORT_INDUSTRY.get(industry,industry),fontsize=10.5)
+        decade_axis(ax);ax.grid(axis="y");ax.set_title(SHORT_INDUSTRY.get(industry,industry),fontsize=10.5)
     axs[0,0].legend(fontsize=8,loc="lower right")
     c.numeric("industry-trends","shares",pd.DataFrame(industry_values))
-    c.figure(14,"industry-trends",fig,"Gender-specific smile trends in the six largest advertiser industries.","Industries selected by ad count, before comparing smile rates. Points require at least 30 assessable faces. "+CI_NOTE)
-    # Standardise on industries with observations for both genders in every decade.
-    # Fixed weights and common strata keep all period/gender comparisons comparable.
-    standard_decades=DECADES[1:]
-    support=b.groupby(["industry","decade","gender"]).size().unstack(["decade","gender"])
-    cols=pd.MultiIndex.from_product([standard_decades,GENDERS],names=["decade","gender"])
-    support=support.reindex(columns=cols,fill_value=0).fillna(0)
-    common=support.index[(support>=20).all(axis=1)].tolist()
-    if len(common)<2:
-        raise ValueError("Too few common industries for direct standardisation")
-    sub=b.loc[b.industry.isin(common)&b.decade.isin(standard_decades)]
-    weights=sub.industry.value_counts(normalize=True).reindex(common)
-    out=[];samples={}
-    for d in standard_decades:
-        for gender in GENDERS:
-            estimates=[c.boot.mean(sub.loc[sub.industry.eq(i)&sub.decade.eq(d)&sub.gender.eq(gender)]) for i in common]
-            v=np.array([e["estimate"] for e in estimates])@weights.to_numpy()
-            bs=np.column_stack([e["samples"] for e in estimates])@weights.to_numpy()
-            lo,hi=np.nanquantile(bs,[.025,.975]);samples[(d,gender)]=bs
-            observed=c.boot.mean(sub.loc[sub.decade.eq(d)&sub.gender.eq(gender)])
-            out.append(dict(decade=d,gender=gender,estimate=v,low=lo,high=hi,observed=observed["estimate"],
-                n=observed["n"],issues=observed["issues"],observed_low=observed["low"],observed_high=observed["high"]))
-    sdf=pd.DataFrame(out);sdf.to_csv(c.work/"industry-standardisation.csv",index=False)
-    fig,axs=plt.subplots(1,2,figsize=(9,3.7),layout="constrained")
-    for gender in GENDERS:
-        q=sdf.loc[sdf.gender.eq(gender)]
-        line_ci(axs[0],standard_decades,q.to_dict("records"),COLORS[gender],gender.capitalize()+", standardised")
-        axs[0].plot(standard_decades,q.observed,"--",color=COLORS[gender],alpha=.75,label=gender.capitalize()+", observed")
-    axs[0].legend(fontsize=7.5);axs[0].set_xticks(standard_decades,[decade_label(d) for d in standard_decades],rotation=30,ha="right");axs[0].set_title("Common-industry smile shares")
-    gaps=[]
-    for d in standard_decades:
-        q=sdf.loc[sdf.decade.eq(d)].set_index("gender")
-        bs=samples[(d,"feminine")]-samples[(d,"masculine")];lo,hi=np.nanquantile(bs,[.025,.975])
-        gaps.append(dict(estimate=q.loc["feminine","estimate"]-q.loc["masculine","estimate"],low=lo,high=hi))
-    line_ci(axs[1],standard_decades,gaps,"#263238","Standardised",False)
-    obs=sdf.pivot(index="decade",columns="gender",values="observed")
-    axs[1].plot(standard_decades,obs.feminine-obs.masculine,"--",color="#66717E",label="Observed")
-    axs[1].yaxis.set_major_formatter(PercentFormatter(1,symbol=""));axs[1].set_ylabel("F-M (percentage points)");axs[1].axhline(0,color="#AAB3BC",lw=.8);axs[1].legend(fontsize=9);axs[1].set_xticks(standard_decades,[decade_label(d) for d in standard_decades],rotation=30,ha="right");axs[1].grid(axis="y");axs[1].set_title("Gender gap")
-    names=", ".join(common)
-    c.numeric("industry-standardised","shares",sdf)
-    c.numeric("industry-standardised","gaps",pd.DataFrame([dict(decade=d,observed=obs.loc[d,"feminine"]-obs.loc[d,"masculine"],**v) for d,v in zip(standard_decades,gaps)]))
-    c.numeric("industry-standardised","weights",weights.rename("weight").rename_axis("industry").reset_index())
-    c.figure(15,"industry-standardised",fig,"Observed and industry-standardised gender smile trends.",
-        f"1950-2007; the sparse 1940s are omitted from standardisation. Common support: {names}; {len(sub):,} faces. Both lines use the same subset; only the standardised lines use fixed pooled industry weights. "+CI_NOTE)
-    c.results.update(industry=detail,common_industries=common,common_industry_coverage=len(sub)/len(b),industry_standardisation=out)
+    c.figure(14,"industry-trends",fig,"Gender-specific smile trends in the six largest advertiser industries.",
+        "Industries selected by ad count, before comparing smile rates. Points require at least 30 assessable faces. 95% CIs calculated as described above.")
+    c.results.update(industry=detail)
     exception=b.loc[b.industry.eq("Toiletries & cosmetics")].groupby(["medium","gender"]).smile.agg(["count","mean"]).reset_index()
     exception.to_csv(c.work/"cosmetics-depiction-followup.csv",index=False)
     c.results["cosmetics_followup"]=exception.to_dict("records")
@@ -532,31 +501,67 @@ def industry_context(c):
 def make_dyads(c):
     p=c.people
     adult=p.age.isin(["young_adult","middle_adult","older_adult"])
-    good=p.n.eq(2)&p.f.eq(1)&p.m.eq(1)&adult&p.smile.notna()&p.geometry_valid
+    good=p.n.eq(2)&p.f.eq(1)&p.m.eq(1)&adult&p.smile.notna()
     q=p.loc[good].copy()
     ids=q.groupby("ad").size();q=q.loc[q.ad.isin(ids.index[ids.eq(2)])]
     f=q.loc[q.gender.eq("feminine")].set_index("ad")
     m=q.loc[q.gender.eq("masculine")].set_index("ad")
     assert f.index.equals(m.index)
-    d=f[["issue","year","decade","period","industry"]].copy()
-    for col in ["smile","intensity","area","x","y","face_width","face_height"]:
-        d["f_"+col]=f[col];d["m_"+col]=m[col]
-    d["both_photo"]=f.medium.eq("Photograph")&m.medium.eq("Photograph")
+    d=f[["issue","year","decade","period"]].copy()
+    d["f_smile"]=f.smile;d["m_smile"]=m.smile
     d["gap"]=d.f_smile-d.m_smile
     d["state"]=np.select([d.f_smile.eq(0)&d.m_smile.eq(0),d.f_smile.eq(1)&d.m_smile.eq(0),d.f_smile.eq(0)&d.m_smile.eq(1)],
         ["Neither","Feminine only","Masculine only"],default="Both")
-    d["log_ratio"]=np.log(d.f_area/d.m_area)
-    d["vertical"]=d.f_y-d.m_y
-    d["size_class"]=pd.cut(d.f_area/d.m_area,[-np.inf,.8,1.25,np.inf],labels=["F smaller","Similar size","F larger"],right=True)
-    d["vertical_class"]=pd.cut(d.vertical,[-np.inf,-.05,.05,np.inf],labels=["F higher","Similar height","F lower"],right=True)
-    d["f_smaller"]=d.f_area.lt(d.m_area).astype(float)
-    d["f_lower"]=d.vertical.gt(0).astype(float)
     return d.reset_index()
 
 
 def relational(c):
     p=c.people;d=make_dyads(c)
-    d.to_pickle(c.work/"adult-dyads-private.pkl")
+    # Separate multi-face ads from the mechanically homogeneous single-face case.
+    multi=c.ads.loc[c.ads.n_faces.ge(2)&c.ads.smile_n.eq(c.ads.n_faces)].copy()
+    multi["smile_state"]=np.select(
+        [multi.smile_yes.eq(0),multi.smile_yes.eq(multi.n_faces)],
+        ["None smiling","All smiling"],default="Mixed")
+    state_order=["None smiling","Mixed","All smiling"]
+    state_colors=["#AAB3BC","#F2C14E","#54A24B"]
+    composition=(pd.crosstab(multi.decade,multi.smile_state)
+        .reindex(index=DECADES,columns=state_order,fill_value=0))
+    composition_share=composition.div(composition.sum(axis=1),axis=0)
+    fig,axs=plt.subplots(1,2,figsize=(9,3.6),layout="constrained")
+    bottom=np.zeros(len(DECADES))
+    for state,color in zip(state_order,state_colors):
+        values=composition_share[state].to_numpy()
+        axs[0].bar(DECADES,values,bottom=bottom,width=7.2,color=color,label=state)
+        bottom+=values
+    pct_axis(axs[0]);decade_axis(axs[0]);axs[0].set_title("Smile configuration")
+    axs[0].legend(fontsize=7.5,loc="upper center",bbox_to_anchor=(.5,-.30),ncol=3,frameon=False,columnspacing=1.2)
+    concentration=[];observed=[];expected=[]
+    for dec in DECADES:
+        q=multi.loc[multi.decade.eq(dec)].copy()
+        q["all_smiling"]=q.smile_yes.eq(q.n_faces).astype(float)
+        smiling=q.loc[q.smile_yes.gt(0)]
+        value=c.boot.mean(smiling,"all_smiling")
+        face_share=q.smile_yes.sum()/q.n_faces.sum()
+        expected_all=np.sum(face_share**q.n_faces)
+        expected_any=np.sum(1-(1-face_share)**q.n_faces)
+        benchmark=expected_all/expected_any
+        observed.append(value);expected.append(benchmark)
+        concentration.append(dict(decade=dec,ads=len(q),smile_containing_ads=len(smiling),
+            face_smile_share=face_share,observed=value["estimate"],low=value["low"],high=value["high"],
+            expected_independence=benchmark,excess=value["estimate"]-benchmark))
+    line_ci(axs[1],DECADES,observed,"#54A24B","Observed in corpus")
+    axs[1].plot(DECADES,expected,"o--",color="#66717E",label="Expected under independence")
+    decade_axis(axs[1]);axs[1].set_ylim(0,.7);axs[1].set_title("All smiling among ads with a smile")
+    axs[1].legend(fontsize=8,loc="lower right")
+    composition_numeric=(composition.rename_axis("decade").reset_index()
+        .melt(id_vars="decade",var_name="state",value_name="n"))
+    composition_numeric["denominator"]=composition_numeric.decade.map(composition.sum(axis=1))
+    composition_numeric["share"]=composition_numeric.n/composition_numeric.denominator
+    c.numeric("multi-face-smile-concentration","composition",composition_numeric)
+    c.numeric("multi-face-smile-concentration","benchmark",pd.DataFrame(concentration))
+    c.figure(16,"multi-face-smile-concentration",fig,
+        "Within-ad concentration of smiling in fully assessed multi-face advertisements.",
+        "Bars classify advertisements with at least two recorded faces and assessable smile labels for every face. The observed series is all-smiling/(all-smiling + mixed). The independence benchmark retains each decade's face-level smile share and observed number of faces per ad while treating faces as independent. 95% CIs calculated as described above.")
     states=["Neither","Feminine only","Masculine only","Both"]
     rows=[]
     for label,q in [("All years",d)]+[(t,d.loc[d.period.eq(t)]) for t in ["1940-59","1960-79","1980-2007"]]:
@@ -566,167 +571,24 @@ def relational(c):
         "Joint smile configurations in mixed-gender adult two-face advertisements.",
         "Exactly two recorded faces, one feminine and one masculine; both have an adult age category and assessable smiles. Each ad contributes once. F-M equals the feminine-only share minus the masculine-only share. "+CI_NOTE,
         {s:".1%" for s in ["Neither","F only","M only","Both"]})
-    fig,axs=plt.subplots(1,2,figsize=(9,3.5),layout="constrained")
-    size_summary=[]
-    for gender in GENDERS:
-        q=p.loc[p.gender.eq(gender)&p.geometry_valid]
-        vals=q.groupby("decade").area.quantile([.25,.5,.75]).unstack().reindex(DECADES)
-        axs[0].plot(DECADES,vals[.5],"o-",color=COLORS[gender],label=gender.capitalize())
-        axs[0].fill_between(DECADES,vals[.25],vals[.75],color=COLORS[gender],alpha=.12)
-        size_summary.extend([dict(gender=gender,decade=int(dec),n=int(q.decade.eq(dec).sum()),q25=row[.25],median=row[.5],q75=row[.75]) for dec,row in vals.iterrows()])
-    pct_axis(axs[0],"Face-box area / ad area (%)",(0,None));decade_axis(axs[0]);axs[0].legend(fontsize=9);axs[0].set_title("Median face size and middle 50%")
-    q=c.binary.copy();q["size_bin"],edges=pd.qcut(q.area,10,labels=False,duplicates="drop",retbins=True)
-    decile_values=[]
-    for gender in GENDERS:
-        vals=[];xs=[]
-        for binid,g in q.loc[q.gender.eq(gender)].groupby("size_bin"):
-            val=c.boot.mean(g);vals.append(val);xs.append(g.area.median())
-            decile_values.append(dict(gender=gender,decile=int(binid)+1,lower_area=edges[int(binid)],upper_area=edges[int(binid)+1],
-                median_area=g.area.median(),smiling=int(g.smile.sum()),**{k:v for k,v in val.items() if k!="samples"}))
-        line_ci(axs[1],xs,vals,COLORS[gender],gender.capitalize())
-    axs[1].set_xscale("log");axs[1].xaxis.set_major_formatter(PercentFormatter(1));axs[1].set_xlabel("Face-box area / ad area (log scale)");axs[1].set_title("Smiling by face-size decile")
-    c.numeric("face-size","historical",pd.DataFrame(size_summary))
-    c.numeric("face-size","deciles",pd.DataFrame(decile_values))
-    c.figure(19,"face-size",fig,"Relative face size over time and its association with smiling.","Size uses the face/head bounding box divided by advertisement area. Left shading is the interquartile range among faces, not a confidence interval. Right intervals use issue resampling; deciles are fixed from the pooled assessable sample.")
     # Prominence ownership uses fractional credit for exact area ties.
-    mixed=p.loc[p.context.eq("Mixed")].copy()
+    all_geometry_valid=p.groupby("ad").geometry_valid.transform("all")
+    mixed=p.loc[p.context.eq("Mixed")&all_geometry_valid].copy()
     mixed["is_largest"]=mixed.area.eq(mixed.groupby("ad").area.transform("max"))
     mixed["largest_credit"]=mixed.is_largest/mixed.groupby("ad").is_largest.transform("sum")
     mixed["female_credit"]=mixed.largest_credit*mixed.gender.eq("feminine")
     own=mixed.groupby("ad").agg(issue=("issue","first"),year=("year","first"),period=("period","first"),observed=("female_credit","sum"),f=("f","first"),n=("n","first"))
     own["expected"]=own.f/own.n;own["excess"]=own.observed-own.expected
-    spatial=[]
-    for label,dq,oq in [("All years",d,own)]+[(t,d.loc[d.period.eq(t)],own.loc[own.period.eq(t)]) for t in ["1940-59","1960-79","1980-2007"]]:
-        ratio=c.boot.mean(dq,"log_ratio");vertical=c.boot.mean(dq,"vertical");ex=c.boot.mean(oq,"excess")
-        spatial.append([label,len(dq),np.exp(ratio["estimate"]),dq.f_lower.mean(),len(oq),oq.observed.mean(),oq.expected.mean(),ci_text(ex["estimate"],ex["low"],ex["high"],signed=True)])
-    c.table(21,"spatial-prominence",pd.DataFrame(spatial,columns=["Period","Pairs","F/M area","F lower","Mixed ads","F largest","Expected","Excess pp [CI]"]),
-        "Relative face size, vertical placement, and largest-face ownership.",
-        "Pairs are defined in @tbl-ch06-dyad-states. F/M area is the geometric mean of paired area ratios. Largest-face ownership uses all known mixed-gender ads, splitting credit for ties; expected ownership is each ad's feminine face share. "+CI_NOTE,
-        {"F/M area":".2f","F lower":".1%","F largest":".1%","Expected":".1%"})
-    own.reset_index().to_pickle(c.work/"prominence-private.pkl")
-    c.results.update(dyads=rows,face_size=size_summary,spatial=spatial)
+    prominence=[]
+    for label,oq in [("All years",own)]+[(t,own.loc[own.period.eq(t)]) for t in ["1940-59","1960-79","1980-2007"]]:
+        ex=c.boot.mean(oq,"excess")
+        prominence.append([label,len(oq),oq.observed.mean(),oq.expected.mean(),ci_text(ex["estimate"],ex["low"],ex["high"],signed=True)])
+    c.table(21,"spatial-prominence",pd.DataFrame(prominence,columns=["Period","Mixed ads","F largest","Expected","Difference pp [CI]"]),
+        "Largest-face ownership in mixed-gender advertisements.",
+        "Includes mixed-gender advertisements with valid face boxes for every recorded face. F largest is the mean share of largest-face credit assigned to feminine-presenting faces; exact ties split credit. Expected is each advertisement's feminine share. Difference is observed minus expected. "+CI_NOTE,
+        {"F largest":".1%","Expected":".1%"})
+    c.results.update(dyads=rows,prominence=prominence)
     c.save("relational")
-
-
-def models(c):
-    import patsy
-    import statsmodels.api as sm
-    from scipy.special import expit
-    p=c.binary.copy()
-    p["age_model"]=p.age.replace({"infant":"Under adult", "child":"Under adult", "adolescent":"Under adult"})
-    industry_n=p.industry.value_counts()
-    p["industry_model"]=p.industry.where(p.industry.map(industry_n)>=200,"Other small industries")
-    # Missing outcomes were removed above; categorical predictor unknowns remain
-    # explicit categories. Geometry validity is audited before this restriction.
-    p=p.loc[p.log_area.notna()].copy()
-    adjusted_formula="smile ~ C(decade) * feminine + C(age_model) + C(industry_model) + C(medium) + log_area + C(model_context)"
-    formulas={"Basic":"smile ~ C(decade) * feminine",
-              "Age adjusted":"smile ~ C(decade) * feminine + C(age_model)", "Adjusted":adjusted_formula}
-    fitted={};margins={};coefs=[]
-    for label,formula in formulas.items():
-        # All three stages use exactly the same observations and target mix.
-        estimation=p
-        y,x=patsy.dmatrices(formula,estimation,return_type="dataframe")
-        if np.linalg.matrix_rank(x.to_numpy()) != x.shape[1]:
-            raise ValueError(f"Rank-deficient design: {label}")
-        fit=sm.GLM(y,x,family=sm.families.Binomial()).fit(cov_type="cluster",cov_kwds={"groups":estimation.issue},maxiter=100)
-        if not fit.converged:
-            raise ValueError(f"Logistic model did not converge: {label}")
-        covariance=np.asarray(fit.cov_params())
-        assert np.linalg.eigvalsh(covariance).min()>-1e-8
-        fitted[label]=dict(fit=fit,design=x.design_info,issues=estimation.issue.nunique())
-        coefs.extend([dict(model=label,term=term,coefficient=fit.params[term],se=fit.bse[term],p=fit.pvalues[term]) for term in x.columns])
-        output=[]
-        for dec in DECADES:
-            estimates={};gradients={}
-            for gender,flag in [("feminine",1),("masculine",0)]:
-                new=estimation.copy();new["decade"]=dec;new["feminine"]=flag
-                design=np.asarray(patsy.build_design_matrices([x.design_info],new)[0])
-                pred=expit(design@fit.params.to_numpy())
-                est=pred.mean();gradient=(design*(pred*(1-pred))[:,None]).mean(axis=0)
-                se=np.sqrt(max(0,float(gradient@covariance@gradient)))
-                estimates[gender]=dict(estimate=est,low=max(0,est-1.96*se),high=min(1,est+1.96*se))
-                gradients[gender]=gradient
-            delta=gradients["feminine"]-gradients["masculine"]
-            gap=estimates["feminine"]["estimate"]-estimates["masculine"]["estimate"]
-            se=np.sqrt(max(0,float(delta@covariance@delta)))
-            output.append(dict(decade=dec,**estimates,gap=dict(estimate=gap,low=gap-1.96*se,high=gap+1.96*se)))
-        margins[label]=output
-    pd.DataFrame(coefs).to_csv(c.work/"regression-coefficients.csv",index=False)
-    # The saturated basic model must reproduce each observed decade/gender rate.
-    for row in margins["Basic"]:
-        for gender in GENDERS:
-            observed=p.loc[p.decade.eq(row["decade"])&p.gender.eq(gender),"smile"].mean()
-            assert abs(observed-row[gender]["estimate"])<1e-7
-    rows=[];prediction_values=[]
-    for raw,age,adj in zip(margins["Basic"],margins["Age adjusted"],margins["Adjusted"]):
-        rows.append([decade_label(adj["decade"]),raw["gap"]["estimate"]*100,
-            ci_text(age["gap"]["estimate"],age["gap"]["low"],age["gap"]["high"],signed=True),
-            adj["feminine"]["estimate"],adj["masculine"]["estimate"],ci_text(adj["gap"]["estimate"],adj["gap"]["low"],adj["gap"]["high"],signed=True)])
-    for label,values in margins.items():
-        for row in values:
-            for outcome in GENDERS+["gap"]:
-                prediction_values.append(dict(model=label,decade=row["decade"],outcome=outcome,n=len(p),issues=p.issue.nunique(),**row[outcome]))
-    c.numeric("adjusted-trends","predictions",pd.DataFrame(prediction_values))
-    model_note=(f"All three logistic models use the same {len(p):,} faces from {p.issue.nunique():,} issues. "
-        "Basic: decade, gender, and their interaction. Age adjusted: additionally perceived age. Fully adjusted: additionally industry, depiction type, log face-area share, and co-presence. "
-        "Infant/child/adolescent are pooled; industries with fewer than 200 assessable binary-gender faces are pooled. "
-        "Predictions average over the same pooled covariate distribution. 95% intervals use issue-clustered covariance and the delta method; they are not bootstrap intervals.")
-    c.table(24,"adjusted-model",pd.DataFrame(rows,columns=["Decade","Basic pp","Age-adjusted pp [CI]","Full F","Full M","Full pp [CI]"]),
-        "The gender smile gap before and after age and wider adjustment.",model_note,{"Basic pp":"+.1f","Full F":".1%","Full M":".1%"})
-    fig,axs=plt.subplots(1,2,figsize=(9,3.6),layout="constrained")
-    for gender in GENDERS:
-        line_ci(axs[0],DECADES,[row[gender] for row in margins["Adjusted"]],COLORS[gender],gender.capitalize())
-    axs[0].set_title("Adjusted predicted smile shares");axs[0].legend();decade_axis(axs[0])
-    for name,color,ls in [("Basic","#AAB3BC","--"),("Age adjusted","#F58518",":"),("Adjusted","#263238","-")]:
-        vals=[row["gap"] for row in margins[name]]
-        line_ci(axs[1],DECADES,vals,color,name,False)
-    axs[1].axhline(0,color="#AAB3BC",lw=.8);axs[1].yaxis.set_major_formatter(PercentFormatter(1,symbol=""));axs[1].set_ylabel("F-M (percentage points)");axs[1].grid(axis="y");axs[1].legend();decade_axis(axs[1]);axs[1].set_title("Basic and adjusted gender gaps")
-    c.figure(25,"adjusted-trends",fig,"Adjusted smile trajectories and sequentially adjusted gender gaps.","Specifications and common sample are defined in @tbl-ch06-adjusted-model. Shading gives pointwise 95% intervals using issue-clustered covariance and the delta method.")
-    sensitivity=[]
-    subsets=[("All assessable F/M",c.binary,None),("Photographs",c.binary.loc[c.binary.medium.eq("Photograph")],None),
-        ("Legibility at least 2",c.binary.loc[c.binary.legibility.ge(2)],None),("Legibility 3",c.binary.loc[c.binary.legibility.eq(3)],None),
-        ("Face area at least 1%",c.binary.loc[c.binary.area.ge(.01)],None),
-        ("Face area at least 2%",c.binary.loc[c.binary.area.ge(.02)],None),
-        ("Area 1% + legibility 2+",c.binary.loc[c.binary.area.ge(.01)&c.binary.legibility.ge(2)],None)]
-    equal=c.binary.copy();equal["ad_weight"]=1/equal.groupby("ad").face.transform("size")
-    subsets.append(("Equal total weight per ad",equal,"ad_weight"))
-    sensdetail=[];subgroup_decades=[]
-    for label,q,w in subsets:
-        allgap=c.boot.gap(q,weight=w);bydec={}
-        for dec in DECADES:
-            z=q.loc[q.decade.eq(dec)];g=c.boot.gap(z,weight=w);overall=c.boot.mean(z,weight=w)
-            bydec[dec]=(g,overall)
-            for gender in GENDERS:
-                v=g[gender]
-                subgroup_decades.append(dict(subset=label,decade=dec,gender=gender,**{k:v for k,v in v.items() if k!="samples"},
-                    gap=g["estimate"],gap_low=g["low"],gap_high=g["high"],overall=overall["estimate"],overall_low=overall["low"],overall_high=overall["high"]))
-        early,earlymean=bydec[1970];late,latemean=bydec[2000]
-        draws=late["samples"]-early["samples"];lo,hi=np.nanquantile(draws,[.025,.975]);change=late["estimate"]-early["estimate"]
-        overallchange=latemean["estimate"]-earlymean["estimate"]
-        overalllo,overallhi=np.nanquantile(latemean["samples"]-earlymean["samples"],[.025,.975])
-        sensitivity.append([label,len(q),early["estimate"]*100,late["estimate"]*100,ci_text(change,lo,hi,signed=True),ci_text(overallchange,overalllo,overallhi,signed=True)])
-        sensdetail.append(dict(subset=label,n=len(q),retained_share=len(q)/len(c.binary),overall_gap=allgap["estimate"],overall_gap_low=allgap["low"],overall_gap_high=allgap["high"],
-            gap1970=early["estimate"],gap2000=late["estimate"],gap_change=change,gap_change_low=lo,gap_change_high=hi,
-            smile_change=overallchange,smile_change_low=overalllo,smile_change_high=overallhi))
-    c.numeric("sensitivity","decades",pd.DataFrame(subgroup_decades))
-    c.numeric("sensitivity","contrasts",pd.DataFrame(sensdetail))
-    c.table(26,"sensitivity",pd.DataFrame(sensitivity,columns=["Sample / weighting","N","1970s gap pp","2000-07 gap pp","Gap change pp [CI]","Smile change pp [CI]"]),
-        "Historical change with minimum face-size and legibility requirements.",
-        "Changes compare 2000-2007 with the 1970s. Gap = feminine minus masculine; smile change pools both presentations. "
-        "Face area is a share of ad area, not a pixel-resolution threshold. The fixed 1% and 2% cutoffs are descriptive, not validated quality limits. "
-        "Equal-ad weighting gives included faces in each ad a combined weight of one. High-legibility subsets change sample composition and are not corrected data. "+CI_NOTE,
-        {"1970s gap pp":"+.1f","2000-07 gap pp":"+.1f"})
-    fitstats=[]
-    for name,items in fitted.items():
-        fit=items["fit"]
-        fitstats.append(dict(model=name,n=int(fit.nobs),issues=items["issues"],parameters=len(fit.params),aic=fit.aic,deviance=fit.deviance,converged=fit.converged))
-    pd.DataFrame(fitstats).to_csv(c.work/"model-fit.csv",index=False)
-    c.results.update(models=fitstats,margins=margins,sensitivity=sensdetail,formula=formulas)
-    leg_detail=c.binary.groupby(["legibility","gender"]).smile.agg(["count","mean"]).reset_index()
-    leg_detail.to_csv(c.work/"legibility-smile-detail.csv",index=False)
-    c.results["legibility_smile"]=leg_detail.to_dict("records")
-    c.save("models")
 
 
 def finalize(c, integrate=False, update_manifest=False):
@@ -735,7 +597,7 @@ def finalize(c, integrate=False, update_manifest=False):
     byorder={e["order"]:e for e in entries}
     assert set(CHAPTER_ORDERS).issubset(byorder), "Missing retained chapter artifact"
     entries=[byorder[i] for i in CHAPTER_ORDERS]
-    assert len(entries)==20 and len({e["name"] for e in entries})==20
+    assert len(entries)==len(CHAPTER_ORDERS) and len({e["name"] for e in entries})==len(entries)
     (c.work/"artifact-index.json").write_text(json.dumps(entries,indent=2)+"\n",encoding="utf-8")
     from chapter06_support import numerical_appendix
     numerical_appendix(c,entries)
@@ -755,33 +617,49 @@ def finalize(c, integrate=False, update_manifest=False):
     if integrate:
         chapter=c.thesis/"06-analysis-results.qmd"
         marker="<!-- BEGIN CH06 GENERATED ANALYSIS -->"
+        end_marker="<!-- END CH06 GENERATED ANALYSIS -->"
         content=chapter.read_bytes()
+        if marker.encode("utf-8") not in content or end_marker.encode("utf-8") not in content:
+            raise RuntimeError("Chapter integration markers are missing; preserve the current manuscript and integrate outputs manually.")
         # Preserve the existing notes verbatim, including their headings.
         prefix=content.split(marker.encode("utf-8"))[0]
         backup=c.work/"chapter06-existing-notes.qmd"
         if not backup.exists():
             backup.write_bytes(prefix)
         blocks=[marker]
-        sections=[(1,"Gender and age in the depicted population"),(5,"Historical development of smiling"),
+        sections=[(2,"Gender and age in the depicted population"),(5,"Historical development of smiling"),
             (12,"Smile intensity"),(6,"Industry and depiction context"),
-            (17,"Within-ad smiling and visual prominence"),(27,"Bivariate associations, adjusted trends, and robustness")]
+            (28,"Comparisons with existing research"),
+            (16,"Within-ad smiling and visual prominence")]
         sectionmap=dict(sections)
         for e in entries:
             if e["order"] in sectionmap:
-                blocks.extend(["", "```{=latex}", "\\clearpage", "```", "", "## "+sectionmap[e["order"]], ""])
+                blocks.extend(["", "\\clearpage", "", "## "+sectionmap[e["order"]], ""])
             elif e["order"] == 7:
-                blocks.extend(["```{=latex}", "\\clearpage", "```", ""])
+                blocks.extend(["\\clearpage", ""])
+            if e["order"] in [28, 29, 30]:
+                if e["order"] != 28:
+                    blocks.extend(["\\clearpage", ""])
+                blocks.extend(["### " + {28: "Jofre and Cole: gendered smiling and historical change",
+                    29: "Financial advertising: representation and age",
+                    30: "Expansive smiles: frequency and intensity"}[e["order"]], ""])
             if e["kind"]=="table":
                 blocks.extend(["{{< include tables/generated/"+e["file"]+" >}}", ""])
             else:
-                caption=e["caption"]+(" "+e["note"] if e["note"] else "")+" Numerical companion: @sec-analysis-numerical-data."
-                blocks.extend([f"![{caption}](figures/generated/fig-{e['file']})"+"{#fig-"+e["name"]+" width=100% fig-pos='H'}", ""])
+                caption=e["caption"]+(" "+e["note"] if e["note"] else "")
+                appendix_anchor = "tbl-ch06-appendix-depiction" if e["name"] == "ch06-depiction-trends" else "sec-analysis-numerical-data"
+                caption += f" Exact values: [numerical companion appendix](appendix-analysis-data.qmd#{appendix_anchor})."
+                # Div syntax permits a real cross-file link in the caption. A
+                # Markdown link cannot be nested safely inside compact image-alt
+                # caption syntax.
+                blocks.extend(["::: {#fig-"+e["name"]+' fig-pos="H"}',
+                    f"![](figures/generated/fig-{e['file']})"+"{width=100%}",
+                    "", caption, "", ":::", ""])
         blocks.append("<!-- END CH06 GENERATED ANALYSIS -->")
         padding=b"" if prefix.endswith(b"\n\n") or prefix.endswith(b"\r\n\r\n") else b"\n\n"
         chapter.write_bytes(prefix+padding+("\n".join(blocks)+"\n").encode("utf-8"))
     provenance={"input":c.results["input"],"bootstrap":{"replicates":2000,"seed":6062026,"cluster":"publication issue","strata":"publication year"},
-        "artifacts":entries,"numerical_appendix":"appendix-analysis-data.qmd","excluded_fields":["face orientation","gaze target"],
-        "model_time":"categorical decade with gender interaction", "standardisation_years":"1950-2007"}
+        "artifacts":entries,"numerical_appendix":"appendix-analysis-data.qmd","excluded_fields":["face orientation","gaze target"]}
     (c.work/"provenance.json").write_text(json.dumps(provenance,indent=2),encoding="utf-8")
     print(f"Verified {len(entries)} artifacts: {sum(e['kind']=='table' for e in entries)} tables and {sum(e['kind']=='figure' for e in entries)} figures.")
 
@@ -791,15 +669,16 @@ def main():
     parser.add_argument("--input",type=Path)
     parser.add_argument("--thesis",type=Path)
     parser.add_argument("--work",type=Path)
-    parser.add_argument("--sections",nargs="+",choices=["foundation","gender","industry","relational","models","support"],default=["foundation","gender","industry","relational","models","support"])
+    parser.add_argument("--sections",nargs="+",choices=["foundation","gender","industry","literature","relational","support"],default=["foundation","gender","industry","literature","relational","support"])
     parser.add_argument("--integrate",action="store_true")
     parser.add_argument("--manifest",action="store_true")
     args=parser.parse_args()
     c=Analysis(args.input,args.thesis,args.work)
-    from chapter06_support import correlations,audit_bootstrap
+    from chapter06_support import audit_bootstrap
+    from chapter06_literature import literature_comparisons
     def support(context):
-        correlations(context);audit_bootstrap(context)
-    functions={"foundation":foundation,"gender":gender_age,"industry":industry_context,"relational":relational,"models":models,"support":support}
+        audit_bootstrap(context)
+    functions={"foundation":foundation,"gender":gender_age,"industry":industry_context,"literature":literature_comparisons,"relational":relational,"support":support}
     for section in args.sections:
         print(f"Running {section}",flush=True);functions[section](c)
     finalize(c,args.integrate,args.manifest)

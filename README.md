@@ -1,8 +1,9 @@
 # The History of Smiles — analysis and reproducibility materials
 
-This repository contains analysis code, selected generated figures, and a
-local bounding-box annotation tool for a computational analysis of facial
-expressions in historical advertising.
+This repository is the public research record for a computational analysis of
+facial expressions in historical advertising. It contains the analysis and
+pipeline source, publication-safe aggregate evidence, selected generated
+figures, and the local annotation interfaces used in the study.
 
 ## Contents
 
@@ -13,11 +14,35 @@ expressions in historical advertising.
   human and model annotation sources
 - `annotation_brand_verification_app/`: local advertisement-category and
   brand-name verification interface
+- `code/pipeline/`: final pipeline source and the archived development
+  iterations used to reach it
+- `artifacts/pipeline/`: checksummed GitHub release assets containing the full
+  reviewed model-only run artifacts
+- `artifacts/human-validation/`: disclosure-safe aggregate results from the
+  300-page, three-coder human--LLM validation
+- `artifacts/brand-industry-verification/`: disclosure-safe aggregate audit
+  results, error-transition inventories, and interpretation guidance
 - `data/README.md`: source provenance, data availability, processing lineage,
   and expected local layout
 
 Notebook outputs are stripped so that embedded records, local paths, and
 images are not accidentally distributed.
+
+## Start here
+
+- The data provenance, exclusions, and transformation chain are documented in
+  `data/README.md`.
+- The final annotation pipeline is described in `code/pipeline/final/README.md`.
+- The downloadable run archives and their verified scope are described in
+  `artifacts/pipeline/README.md`.
+- The human-validation evidence and its limits are documented in
+  `artifacts/human-validation/README.md`.
+
+Raw archive scans, human annotation records, and row-level analysis tables are
+not public. Their exclusion reflects archive licensing and disclosure rules,
+not an absence of validation evidence: the public aggregate tables report the
+sample sizes, denominators, matching rules, agreement measures, and main error
+diagnostics used in the thesis.
 
 ## Python environment
 

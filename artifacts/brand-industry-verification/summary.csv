@@ -1,0 +1,8 @@
+metric,basis,successes,denominator,percent
+Field-scorable identification,all reviewed items,196,200,98.0
+Industry category agreement,conditional on scorable identification,183,196,93.4
+Brand-name agreement,conditional on scorable identification,193,196,98.5
+Both fields agree,conditional on scorable identification,182,196,92.9
+Industry category end-to-end,identification failures count as failures,183,200,91.5
+Brand-name end-to-end,identification failures count as failures,193,200,96.5
+Both fields end-to-end,identification failures count as failures,182,200,91.0

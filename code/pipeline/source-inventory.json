@@ -2,6 +2,10 @@
   "schema_version": 1,
   "source_root": "qwen_iteration",
   "included_first_party_source_files": 113,
+  "included_source_breakdown": {
+    "python": 112,
+    "powershell": 1
+  },
   "included_accounting_notebooks": 1,
   "transformations": [
     "Machine-specific absolute paths were replaced by relative or environment-backed paths.",

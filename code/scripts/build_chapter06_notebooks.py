@@ -23,8 +23,9 @@ for base in [Path.cwd(), *Path.cwd().parents]:
     candidates.extend([base, base / "code/scripts", base / "master_thesis-public/code/scripts", base / "analysis/code/scripts"])
 code_dir = next(path for path in candidates if (path / "chapter06_analysis.py").is_file())
 sys.path.insert(0, str(code_dir))
-from chapter06_analysis import Analysis, foundation, gender_age, industry_context, relational, models, finalize
-from chapter06_support import correlations, audit_bootstrap
+from chapter06_analysis import Analysis, foundation, gender_age, industry_context, relational, finalize
+from chapter06_support import audit_bootstrap
+from chapter06_literature import literature_comparisons
 
 # CH06_INPUT, CH06_THESIS and CH06_WORK override the local layout defaults.
 c = Analysis()
@@ -53,15 +54,15 @@ def main():
     args.work=args.work.resolve();args.work.mkdir(parents=True,exist_ok=True)
     definitions={
       "chapter06_historical_analysis":notebook("Historical smiling: corpus, gender, age and industry",[
-        ("Corpus and historical development","Smile presence uses yes/(yes + no). Other labels remain explicit. Intensity uses smiling faces. Whole issues are resampled within year, using a common seed and 2,000 replicates.","foundation(c)\nc.show(1, 6)"),
+        ("Corpus and historical development","Smile presence uses yes/(yes + no). Advertisement summaries distinguish any smile, the mean within-ad smile share, and all recorded faces smiling. Indeterminate advertisement-level statuses remain missing. Other labels remain explicit. Intensity uses smiling faces. Whole issues are resampled within year, using a common seed and 2,000 replicates.","foundation(c)\ndisplay(pd.read_csv(c.work / 'numerical-data/ch06-historical-smiling--ads.csv'))\nc.show(1, 6)"),
         ("Gender and age","Gender differences are feminine minus masculine, reported in percentage points. Age and intensity retain their ordered recorded categories. Sparse age cells are omitted from comparative plots, with counts retained in supporting data.","gender_age(c)\nc.show(7, 12)"),
-        ("Industry and depiction context","Industry standardisation uses six industries with at least 20 assessable faces in each gender and decade from 1950. Observed and standardised lines share the same sample. Ad composition is assigned before dropping unassessable smile records.","industry_context(c)\nc.show(13, 16)"),
+        ("Industry and depiction context","The six industry facets are selected by advertisement count before smile rates are compared. Smile-rate points with fewer than 30 assessable faces are suppressed while their exact counts remain in the numerical companion.","industry_context(c)\nc.show(13, 14)"),
+        ("Comparisons with existing research","Jofre and Cole's published ratio and around-1970 observation pool news and ads; our comparison uses advertising only. The financial-ad study cited as unda2024GenderStereotypes overlaps the underlying Economist archive; the unique largest face is only a central-person proxy. Broad/laughter-like intensity is compared both among all assessed faces and conditional on smiling. Every interval uses the common issue/year draws; published benchmarks are not treated as independent observations.","literature_comparisons(c)\nc.show(28, 30)"),
         ("Focused follow-up: the cosmetics exception","The same industry contrast is recomputed separately for photographs and other depictions.","display(pd.read_csv(c.work / 'cosmetics-depiction-followup.csv'))")]),
-      "chapter06_relational_analysis":notebook("Relational smiling, visual prominence and adjusted trends",[
-        ("Within-ad comparisons and spatial presentation","Adult pairs require exactly two recorded faces, one feminine and one masculine, both adults with assessable smiles. Face area is relative to ad area. Largest-face ownership is compared with each ad's feminine numerical share; exact ties split credit.","relational(c)\nc.show(17, 23)"),
-        ("Adjusted smile trajectories","The main logistic model uses decade-by-gender, age, industry, depiction type, relative face area and co-presence. An intermediate model controls age alone; all three specifications share the same sample. Legibility is checked through restricted samples because its labels are strongly coupled to smile presence. Covariance is clustered by issue; marginal-probability intervals use the delta method.","models(c)\nc.show(24, 26)"),
-        ("Simple correlations and bootstrap audit","Four Spearman associations are compared within gender, with the same issue/year bootstrap and ranks recomputed per draw. The audit checks year-wise counts, explicit resampled rows, tied-rank handling and interval stability with an independent 5,000-draw run.","correlations(c)\nc.show(27, 27)\naudit_bootstrap(c)\ndisplay(pd.read_csv(c.work / 'bootstrap-audit.csv'))"),
-        ("Model and artifact checks","Check convergence, model sample sizes and the 20 retained chapter outputs and complete numerical companion. Source notebooks remain output-free in Git; executed copies stay in private output storage.","display(pd.read_csv(c.work / 'model-fit.csv'))\nfinalize(c)")])}
+      "chapter06_relational_analysis":notebook("Relational smiling and visual prominence",[
+        ("Within-ad comparisons and visual prominence","Smile concentration is first evaluated among fully assessed advertisements with at least two faces, including a descriptive independence benchmark that retains decade-specific face smile shares and observed face counts per ad. Adult pairs then require exactly two recorded faces, one feminine and one masculine, both adults with assessable smiles. Largest-face ownership in mixed-gender advertisements is compared with each ad's feminine numerical share; exact ties split credit.","relational(c)\nc.show(16, 21)"),
+        ("Bootstrap audit","The audit checks year-wise counts, explicit resampled rows and interval stability with an independent 5,000-draw run.","audit_bootstrap(c)\ndisplay(pd.read_csv(c.work / 'bootstrap-audit.csv'))"),
+        ("Artifact checks","Check the 16 retained chapter outputs and complete numerical companion. Source notebooks remain output-free in Git; executed copies stay in private output storage.","finalize(c)")])}
     for name,nb in definitions.items():
         nbformat.validate(nb)
         nbformat.write(nb,HERE/(name+".ipynb"))
