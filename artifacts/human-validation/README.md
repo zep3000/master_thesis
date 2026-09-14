@@ -7,15 +7,17 @@ below retain their final denominators and notes.
 
 The pseudonymized row-level exports are under `raw/`, with file-level checksums
 and transformation counts in `raw/manifest.json`. They include the 900 records
-from the three-coder validation, 201 brand/industry review records, and 1,599
-face-box rows from the full-issue scans. Source images and visual error atlases
-remain excluded because they reproduce licensed magazine imagery.
+from the three-coder validation, the complete 398-page pipeline-development
+gold record, 201 brand/industry review records, and 1,599 face-box rows from the
+full-issue scans. Source images and visual error atlases remain excluded because
+they reproduce licensed magazine imagery.
 
-Direct assignee names are replaced by A, B, and C. Assignment/session codes,
-comments, notes, and absolute machine paths are removed. Annotation-set IDs,
-pseudonymous session IDs, timestamps, page identifiers, geometry, workflow
-telemetry, and substantive judgments remain. The result is pseudonymized, not
-anonymous: an external mapping could reconnect a session ID to a coder.
+Direct assignee names are replaced by A, B, and C for the three-coder set and D
+for the named pipeline-development export. Assignment/session codes, comments,
+notes, and absolute machine paths are removed. Annotation-set IDs, pseudonymous
+session IDs, timestamps, page identifiers, geometry, workflow telemetry, and
+substantive judgments remain. The result is pseudonymized, not anonymous: an
+external mapping could reconnect a session ID to a coder.
 
 ## Scope and definitions
 

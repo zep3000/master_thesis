@@ -8,10 +8,17 @@ schemas and prompts, while `matching.py`, `verify.py`, and
 The code is preserved for methodological inspection. Licensed source images,
 human labels, credentials, and run outputs are not stored beside it. Reviewed
 machine-readable outputs are indexed in `../../../artifacts/pipeline/`.
+The pseudonymized 198-page difficult and 200-page stratified human-gold exports
+used for pipeline development and evaluation are published separately under
+`../../../artifacts/human-validation/raw/pipeline-development/`. They supported
+prompt and pipeline selection plus held-out checks; no model weights were
+trained on them.
 
 Paths are local configuration rather than repository assumptions. Set
 `PIPELINE_IMAGE_DIR` and either `OPENROUTER_API_KEY` or
-`OPENROUTER_KEY_FILE` before attempting inference.
+`OPENROUTER_KEY_FILE` before attempting inference. Manifest regeneration also
+accepts `PIPELINE_DIFFICULT_IMAGE_DIR` for the licensed difficult-cohort images;
+its gold inputs resolve to the public pseudonymized exports above.
 
 ## Complete-case production baseline
 

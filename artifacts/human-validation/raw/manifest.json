@@ -1,7 +1,7 @@
 {
-  "schema_version": "human_annotation_publication_v1",
+  "schema_version": "human_annotation_publication_v2",
   "sanitization": {
-    "assignee_name": "replaced with A, B, or C in the three-coder exports",
+    "assignee_name": "replaced with A, B, or C in the three-coder exports and D in the named pipeline-development export",
     "assignment_and_session_codes": "removed",
     "comments_and_notes": "removed",
     "absolute_paths": "replaced with portable source-images/ or manifests/ paths",
@@ -43,6 +43,38 @@
             "assignment_code_removed": 600,
             "assignee_name_replaced": 300,
             "comment_fields_removed": 300
+          }
+        }
+      ]
+    },
+    {
+      "name": "pipeline development and evaluation",
+      "records": 398,
+      "nominal_sample_size": 400,
+      "distinct_annotated_pages": 398,
+      "development_pages": 280,
+      "reserve_pages": 118,
+      "files": [
+        {
+          "path": "pipeline-development/difficult-198.json",
+          "records": 198,
+          "bytes": 5481646,
+          "sha256": "3a13098c70462d39e9983204057d9715324ac1c13d49815deca742e43d165997",
+          "transformations": {
+            "other_assignment_records_excluded": 1,
+            "comment_fields_removed": 199,
+            "assignment_code_removed": 403
+          }
+        },
+        {
+          "path": "pipeline-development/stratified-200.json",
+          "records": 200,
+          "bytes": 4264124,
+          "sha256": "6dcb040a835653084136dfe676c4d454c04b3a4d1e62f94cb08421a9077cb825",
+          "transformations": {
+            "assignment_code_removed": 403,
+            "assignee_name_replaced": 200,
+            "comment_fields_removed": 200
           }
         }
       ]

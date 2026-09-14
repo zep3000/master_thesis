@@ -22,13 +22,16 @@ from typing import Any
 import matching as local_matching
 
 
-ROOT = Path(r".")
 HERE = Path(__file__).resolve().parent
+REPOSITORY_ROOT = HERE.parents[2]
+HUMAN_GOLD = (
+    REPOSITORY_ROOT / "artifacts" / "human-validation" / "raw" / "pipeline-development"
+)
 OUTPUT = HERE / "output"
 COST_RUN_ID = "standalone_final_398_v1"
 GOLD = {
-    "difficult": ROOT / "annotation_results" / "test_collection_200_difficult_joined_v1_2026-08-02.json",
-    "stratified": ROOT / "annotation_results" / "economist_decade_face_count_stratified_200_seed20260812_min2_2026-08-13_full.json",
+    "difficult": HUMAN_GOLD / "difficult-198.json",
+    "stratified": HUMAN_GOLD / "stratified-200.json",
 }
 MODES = [
     "optimal_strict", "optimal_lenient", "optimal_iou_0.5",
@@ -68,8 +71,6 @@ def gold(cohort: str) -> dict[str, dict[str, Any]]:
     payload = json.loads(GOLD[cohort].read_text(encoding="utf-8"))
     result = {}
     for row in payload.get("annotations") or []:
-        if cohort == "difficult" and row.get("assignment_code") != "79201188":
-            continue
         if isinstance(row.get("payload"), dict):
             result[str(row["image_id"])] = row["payload"]
     return result

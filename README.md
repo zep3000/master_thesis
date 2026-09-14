@@ -20,7 +20,8 @@ study.
 - `artifacts/pipeline/`: checksummed GitHub release assets containing the full
   reviewed model-only run artifacts
 - `artifacts/human-validation/`: pseudonymized row-level human annotations,
-  full-issue face boxes, and aggregate validation results
+  pipeline-development gold data, full-issue face boxes, and aggregate
+  validation results
 - `artifacts/brand-industry-verification/`: disclosure-safe aggregate audit
   results, error-transition inventories, and interpretation guidance
 - `data/README.md`: source provenance, data availability, processing lineage,

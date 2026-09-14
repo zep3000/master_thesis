@@ -103,10 +103,13 @@ distributed as GitHub release assets indexed by
 The release archives exclude source imagery, human/gold records, credentials,
 local logs, and machine-specific paths.
 
-The main 300-page, three-coder human records and the corresponding aggregate
-human--LLM results are in `artifacts/human-validation/`. The row-level records
-permit independent recalculation when paired with the released model output;
-the aggregate tables report the entity counts, spatial detection results,
+The main 300-page, three-coder human records, both complete pipeline-development
+gold exports (198 difficult and 200 stratified pages), and the corresponding
+aggregate human--LLM results are in `artifacts/human-validation/`. The final
+pipeline's frozen split used the first 140 pages from each development export
+and retained the remaining 118 pages as reserves. The row-level records permit
+independent recalculation when paired with the released model output; the
+aggregate tables report the entity counts, spatial detection results,
 people-area results, cohort attrition, agreement measures, and ordinal
 diagnostics used in Chapter 5. Licensed source imagery remains excluded.
 

@@ -7,21 +7,35 @@ copied into the inference package, which keeps the gold/evaluation boundary expl
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 
 HERE = Path(__file__).resolve().parent
-ROOT = HERE.parents[1]
+REPOSITORY_ROOT = HERE.parents[2]
+HUMAN_GOLD = (
+    REPOSITORY_ROOT / "artifacts" / "human-validation" / "raw" / "pipeline-development"
+)
 
 SOURCES = {
     "difficult": {
-        "gold": ROOT / "annotation_results" / "test_collection_200_difficult_joined_v1_2026-08-02.json",
-        "image_dir": ROOT / "code" / "test_collection_200_difficult_joined_pages",
+        "gold": HUMAN_GOLD / "difficult-198.json",
+        "image_dir": Path(
+            os.environ.get(
+                "PIPELINE_DIFFICULT_IMAGE_DIR",
+                REPOSITORY_ROOT / "data" / "images" / "pipeline-development-difficult",
+            )
+        ),
         "expected": 198,
     },
     "stratified": {
-        "gold": ROOT / "annotation_results" / "economist_decade_face_count_stratified_200_seed20260812_min2_2026-08-13_full.json",
-        "image_dir": ROOT / "master_thesis" / "data" / "images" / "full_pages_1940_2007_joined",
+        "gold": HUMAN_GOLD / "stratified-200.json",
+        "image_dir": Path(
+            os.environ.get(
+                "PIPELINE_IMAGE_DIR",
+                REPOSITORY_ROOT / "data" / "images" / "full_pages_1940_2007_joined",
+            )
+        ),
         "expected": 200,
     },
 }

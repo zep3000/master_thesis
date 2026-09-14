@@ -9,6 +9,7 @@
   "included_accounting_notebooks": 1,
   "transformations": [
     "Machine-specific absolute paths were replaced by relative or environment-backed paths.",
+    "Final evaluation gold paths were pointed to the pseudonymized public exports and obsolete assignment-code filtering was removed.",
     "The accounting notebook was adapted to release-asset extraction and kept output-free.",
     "A tested complete-case cleanup utility documents and removes the three reviewed incomplete production pages without invoking inference."
   ],

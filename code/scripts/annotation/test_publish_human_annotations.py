@@ -4,7 +4,11 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from publish_human_annotations import publish_coder, publish_full_issue_scans
+from publish_human_annotations import (
+    publish_coder,
+    publish_development_export,
+    publish_full_issue_scans,
+)
 
 
 class PublicationExportTests(unittest.TestCase):
@@ -77,6 +81,68 @@ class PublicationExportTests(unittest.TestCase):
             self.assertEqual(len(entries), 35)
             self.assertEqual(scope["records"], 1599)
             self.assertEqual(scope["unique_page_identifiers"], 1599)
+
+    def test_development_export_selects_assignment_and_removes_codes(self):
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as directory:
+            root = Path(directory)
+            source = root / "source.json"
+            destination = root / "published.json"
+            source.write_text(
+                json.dumps(
+                    {
+                        "annotation_set": {"id": "keep-set"},
+                        "annotations": [
+                            {
+                                "image_id": "one",
+                                "assignee_name": "Private Name",
+                                "assignment_code": "selected",
+                                "payload": {
+                                    "session": {"session_code": "remove"},
+                                    "copied_from": {
+                                        "source_assignment_code": "remove-too",
+                                        "source_assignment_id": "keep-id",
+                                    },
+                                    "urgent_comments": ["remove"],
+                                },
+                            },
+                            {
+                                "image_id": "two",
+                                "assignee_name": "Private Name",
+                                "assignment_code": "selected",
+                                "payload": {},
+                            },
+                            {
+                                "image_id": "stray",
+                                "assignment_code": "other",
+                                "payload": {},
+                            },
+                        ],
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            entry = publish_development_export(
+                source,
+                destination,
+                expected_records=2,
+                label="D",
+                assignment_code="selected",
+            )
+            published = json.loads(destination.read_text(encoding="utf-8"))
+            serialized = json.dumps(published)
+
+            self.assertEqual(entry["records"], 2)
+            self.assertEqual(
+                entry["transformations"]["other_assignment_records_excluded"], 1
+            )
+            self.assertEqual(
+                {row["assignee_name"] for row in published["annotations"]}, {"D"}
+            )
+            self.assertIn('"source_assignment_id": "keep-id"', serialized)
+            self.assertNotIn("assignment_code", serialized)
+            self.assertNotIn("session_code", serialized)
+            self.assertNotIn("urgent_comments", serialized)
 
 
 if __name__ == "__main__":

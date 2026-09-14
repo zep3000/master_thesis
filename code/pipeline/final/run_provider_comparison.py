@@ -25,7 +25,14 @@ SAMPLE_COHORT = "sample50"
 SAMPLE_SIZE = 50
 OUTPUT_ROOT = run.BASE_OUTPUT / "experiments" / "provider_comparison_first50"
 SAMPLE_MANIFEST = OUTPUT_ROOT / "sample_manifest.json"
-GOLD_EXPORT = run.ROOT / "annotation_results" / "test_collection_200_difficult_joined_v1_2026-08-02.json"
+GOLD_EXPORT = (
+    Path(__file__).resolve().parents[2]
+    / "artifacts"
+    / "human-validation"
+    / "raw"
+    / "pipeline-development"
+    / "difficult-198.json"
+)
 PROVIDERS = ("deepinfra/bf16", "parasail/bf16", "venice/fp8")
 
 
@@ -43,8 +50,7 @@ def prepare_sample() -> dict[str, Any]:
     certified = {
         str(row["image_id"]): row
         for row in gold.get("annotations") or []
-        if row.get("assignment_code") == "79201188"
-        and row.get("assignment_status") == "done"
+        if row.get("assignment_status") == "done"
         and row.get("status") in {"complete", "ineligible"}
         and isinstance(row.get("payload"), dict)
     }
@@ -55,7 +61,7 @@ def prepare_sample() -> dict[str, Any]:
     manifest = {
         "schema_version": "qwen_provider_comparison_manifest_v1",
         "cohort": SAMPLE_COHORT,
-        "selection": "first 50 images in the frozen difficult manifest; all have completed assignment 79201188",
+        "selection": "first 50 images in the frozen difficult manifest; all have completed human records",
         "source_manifest": str(run.HERE / "data" / "manifest_difficult.json"),
         "gold_export": str(GOLD_EXPORT),
         "image_dir": source["image_dir"],
